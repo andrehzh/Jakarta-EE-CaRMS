@@ -6,11 +6,19 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -23,14 +31,41 @@ public class Outlet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
+    @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String outletName;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Column(nullable = false)
+    @NotNull
     private Date openingTime;
-    private Date closingTime; 
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Column(nullable = false)
+    @NotNull
+    private Date closingTime;
+    
+    @OneToMany(mappedBy = "outlet")
+    private List<Employee> employees;
+    
+    @ManyToMany(mappedBy = "outlets")
+    private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
+    
+    @ManyToMany(mappedBy = "outlets")
+    private List<Reservation> reservations;
+    
+    @OneToMany(mappedBy = "cars")
+    private List<Car> cars;
 
     public Outlet() {
+        employees = new ArrayList<>();
+        transitDriverDispatchRecords = new ArrayList<>();
+        reservations = new ArrayList<>();
+        cars = new ArrayList<>();
     }
 
     public Outlet(String outletName, Date openingTime, Date closingTime) {
+        this();
+        
         this.outletName = outletName;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
@@ -42,6 +77,62 @@ public class Outlet implements Serializable {
 
     public void setOutletId(Long outletId) {
         this.outletId = outletId;
+    }
+
+    /**
+     * @return the employees
+     */
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    /**
+     * @param employees the employees to set
+     */
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
+
+    /**
+     * @return the transitDriverDispatchRecords
+     */
+    public List<TransitDriverDispatchRecord> getTransitDriverDispatchRecords() {
+        return transitDriverDispatchRecords;
+    }
+
+    /**
+     * @param transitDriverDispatchRecords the transitDriverDispatchRecords to set
+     */
+    public void setTransitDriverDispatchRecords(List<TransitDriverDispatchRecord> transitDriverDispatchRecords) {
+        this.transitDriverDispatchRecords = transitDriverDispatchRecords;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
+    /**
+     * @return the cars
+     */
+    public List<Car> getCars() {
+        return cars;
+    }
+
+    /**
+     * @param cars the cars to set
+     */
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
     }
 
     @Override
@@ -110,5 +201,5 @@ public class Outlet implements Serializable {
     public void setClosingTime(Date closingTime) {
         this.closingTime = closingTime;
     }
-    
+
 }

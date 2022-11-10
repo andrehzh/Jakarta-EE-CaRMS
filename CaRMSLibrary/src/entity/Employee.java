@@ -7,10 +7,17 @@ package entity;
 
 import enumerations.EmployeeAccessRightEnum;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -23,15 +30,35 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
+    @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String employeeName;
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String employeeEmail;
+    @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
     private String employeePassword;
+    @Column(nullable = false)
+    @NotNull
     private EmployeeAccessRightEnum accessRight;
+    
+    @OneToMany(mappedBy = "employee")
+    private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
+    
+    @ManyToOne
+    private Outlet outlet;
 
     public Employee() {
+        transitDriverDispatchRecords = new ArrayList<>();
     }
 
     public Employee(String employeeName, String employeeEmail, String employeePassword, EmployeeAccessRightEnum accessRight) {
+        this();
+        
         this.employeeName = employeeName;
         this.employeeEmail = employeeEmail;
         this.employeePassword = employeePassword;
@@ -44,6 +71,34 @@ public class Employee implements Serializable {
 
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
+    }
+
+    /**
+     * @return the transitDriverDispatchRecords
+     */
+    public List<TransitDriverDispatchRecord> getTransitDriverDispatchRecords() {
+        return transitDriverDispatchRecords;
+    }
+
+    /**
+     * @param transitDriverDispatchRecords the transitDriverDispatchRecords to set
+     */
+    public void setTransitDriverDispatchRecords(List<TransitDriverDispatchRecord> transitDriverDispatchRecords) {
+        this.transitDriverDispatchRecords = transitDriverDispatchRecords;
+    }
+
+    /**
+     * @return the outlet
+     */
+    public Outlet getOutlet() {
+        return outlet;
+    }
+
+    /**
+     * @param outlet the outlet to set
+     */
+    public void setOutlet(Outlet outlet) {
+        this.outlet = outlet;
     }
 
     @Override

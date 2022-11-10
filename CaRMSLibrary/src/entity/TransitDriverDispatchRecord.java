@@ -6,11 +6,19 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -24,9 +32,20 @@ public class TransitDriverDispatchRecord implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitDriverDispatchRecordId;
     private boolean isCompleted;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Column(nullable = false)
+    @NotNull
     private Date dispatchDate;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Employee employee;
+    
+    @ManyToMany(mappedBy = "transitRecords")
+    private List<Outlet> outlets;
 
     public TransitDriverDispatchRecord() {
+        outlets = new ArrayList<>();
     }
 
     public TransitDriverDispatchRecord(boolean isCompleted, Date dispatchDate) {
@@ -40,6 +59,34 @@ public class TransitDriverDispatchRecord implements Serializable {
 
     public void setTransitDriverDispatchRecordId(Long transitDriverDispatchRecordId) {
         this.transitDriverDispatchRecordId = transitDriverDispatchRecordId;
+    }
+
+    /**
+     * @return the employee
+     */
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    /**
+     * @param employee the employee to set
+     */
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    /**
+     * @return the outlets
+     */
+    public List<Outlet> getOutlets() {
+        return outlets;
+    }
+
+    /**
+     * @param outlets the outlets to set
+     */
+    public void setOutlets(List<Outlet> outlets) {
+        this.outlets = outlets;
     }
 
     @Override
