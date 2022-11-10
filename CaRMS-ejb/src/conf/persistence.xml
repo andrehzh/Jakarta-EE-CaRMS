@@ -6,8 +6,14 @@
     <class>entity.Car</class>
     <class>entity.CarModel</class>
     <class>entity.Category</class>
+    <class>entity.CreditCard</class>
     <class>entity.Employee</class>
     <class>entity.Outlet</class>
+    <class>entity.OwnCustomer</class>
+    <class>entity.Partner</class>
+    <class>entity.RentalRate</class>
+    <class>entity.Reservation</class>
+    <class>entity.ReservationTransaction</class>
     <class>entity.TransitDriverDispatchRecord</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
