@@ -8,7 +8,7 @@ package ejb.session.stateless;
 import entity.CarModel;
 import java.util.List;
 import java.util.Set;
-import util.exception.CarModelNotFoundExeception;
+import util.exception.CarModelNotFoundException;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -62,12 +62,12 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundExeception {
+    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundException {
         CarModel carModel = em.find(CarModel.class, id);
         if (carModel != null) {
             return carModel;
         } else {
-            throw new CarModelNotFoundExeception("Car Model " + id.toString() + " does not exist!");
+            throw new CarModelNotFoundException("Car Model " + id.toString() + " does not exist!");
         }
     }
 
@@ -76,6 +76,35 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         Query query = em.createQuery("SELECT cm FROM CarModel cm");
 
         return query.getResultList();
+    }
+
+    @Override
+    public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException //, UpdateCarModelException
+    {
+        if (carModel != null && carModel.getCarModelId() != null) {
+            Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+
+            if (constraintViolations.isEmpty()) {
+                CarModel carModelToUpdate = retrieveCarModelById(carModel.getCarModelId());
+                carModelToUpdate.setCarModelBrand(carModel.getCarModelBrand());
+                carModelToUpdate.setCarModelName(carModel.getCarModelName());
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new CarModelNotFoundException("Car Model " + carModel.getCarModelId().toString() + " does not exist!");
+        }
+    }
+
+    @Override
+    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException //, DeleteCarModelException
+    {
+        CarModel carModelToRemove = retrieveCarModelById(carModelId);
+        if (carModelToRemove != null) {
+            em.remove(carModelToRemove);
+        } else {
+            throw new CarModelNotFoundException("Car Model " + carModelId.toString() + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {

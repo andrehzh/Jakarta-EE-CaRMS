@@ -18,7 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
-import util.exception.OutletNotFoundExeception;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -62,12 +62,12 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     }
 
     @Override
-    public Outlet retrieveOutletById(Long id) throws OutletNotFoundExeception {
+    public Outlet retrieveOutletById(Long id) throws OutletNotFoundException {
         Outlet outlet = em.find(Outlet.class, id);
         if (outlet != null) {
             return outlet;
         } else {
-            throw new OutletNotFoundExeception("Outlet " + id.toString() + " does not exist!");
+            throw new OutletNotFoundException("Outlet " + id.toString() + " does not exist!");
         }
     }
 

@@ -18,7 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.EmployeeEmailExistsException;
-import util.exception.EmployeeNotFoundExeception;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -66,12 +66,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
 
     @Override
-    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundExeception {
+    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException {
         Employee employee = em.find(Employee.class, id);
         if (employee != null) {
             return employee;
         } else {
-            throw new EmployeeNotFoundExeception("Employee " + id.toString() + " does not exist!");
+            throw new EmployeeNotFoundException("Employee " + id.toString() + " does not exist!");
         }
     }
 

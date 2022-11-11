@@ -9,7 +9,7 @@ import entity.Employee;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.EmployeeEmailExistsException;
-import util.exception.EmployeeNotFoundExeception;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -22,7 +22,7 @@ public interface EmployeeSessionBeanRemote {
 
     public Long createNewEmployee(Employee employee) throws UnknownPersistenceException, InputDataValidationException, EmployeeEmailExistsException;
 
-    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundExeception;
+    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException;
 
     public List<Employee> retrieveAllEmployees();
 

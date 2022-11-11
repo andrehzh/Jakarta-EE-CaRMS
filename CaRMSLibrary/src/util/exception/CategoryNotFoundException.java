@@ -9,12 +9,12 @@ package util.exception;
  *
  * @author tian
  */
-public class OutletNotFoundExeception extends Exception {
+public class CategoryNotFoundException extends Exception {
 
-    public OutletNotFoundExeception() {
+    public CategoryNotFoundException() {
     }
 
-    public OutletNotFoundExeception(String msg) {
+    public CategoryNotFoundException(String msg) {
         super(msg);
     }
 
