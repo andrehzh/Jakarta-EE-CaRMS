@@ -12,6 +12,7 @@ import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateEmployeeException;
 
 /**
  *
@@ -25,5 +26,9 @@ public interface EmployeeSessionBeanLocal {
     public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException;
 
     public List<Employee> retrieveAllEmployees();
+
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, InputDataValidationException, UpdateEmployeeException;
+
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException;
 
 }

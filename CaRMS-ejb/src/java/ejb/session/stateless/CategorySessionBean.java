@@ -99,7 +99,7 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
         } else {
-            throw new CategoryNotFoundException("Category" + category.getCategoryId().toString() + " does not exist!");
+            throw new CategoryNotFoundException("Category " + category.getCategoryId().toString() + " does not exist!");
         }
     }
 

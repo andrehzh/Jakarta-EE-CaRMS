@@ -21,6 +21,7 @@ import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateEmployeeException;
 
 /**
  *
@@ -80,6 +81,39 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         Query query = em.createQuery("SELECT e FROM Employee e");
 
         return query.getResultList();
+    }
+
+    @Override
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, InputDataValidationException, UpdateEmployeeException {
+        if (employee != null && employee.getEmployeeId() != null) {
+            Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
+
+            if (constraintViolations.isEmpty()) {
+                Employee employeeToUpdate = retrieveEmployeeById(employee.getEmployeeId());
+                if (employeeToUpdate.getEmployeeEmail().equals(employee.getEmployeeEmail())) {
+                    employeeToUpdate.setEmployeeName(employee.getEmployeeName());
+                    employeeToUpdate.setEmployeePassword(employee.getEmployeePassword());
+                    employeeToUpdate.setAccessRight(employee.getAccessRight());
+                } else {
+                    throw new UpdateEmployeeException("UpdateEmployeeException");
+                }
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new EmployeeNotFoundException("Employee " + employee.getEmployeeId().toString() + " does not exist!");
+        }
+    }
+
+    @Override
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException //, DeleteEmployeeException
+    {
+        Employee employeeToRemove = retrieveEmployeeById(employeeId);
+        if (employeeToRemove != null) {
+            em.remove(employeeToRemove);
+        } else {
+            throw new EmployeeNotFoundException("Employee " + employeeId.toString() + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {

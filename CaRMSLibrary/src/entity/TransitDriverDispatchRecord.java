@@ -31,16 +31,18 @@ public class TransitDriverDispatchRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitDriverDispatchRecordId;
+    @Column(nullable = false)
+    @NotNull
     private boolean isCompleted;
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(nullable = false)
     @NotNull
     private Date dispatchDate;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Employee employee;
-    
+
     @ManyToMany(mappedBy = "transitRecords")
     private List<Outlet> outlets;
 
@@ -141,5 +143,5 @@ public class TransitDriverDispatchRecord implements Serializable {
     public void setDispatchDate(Date dispatchDate) {
         this.dispatchDate = dispatchDate;
     }
-    
+
 }

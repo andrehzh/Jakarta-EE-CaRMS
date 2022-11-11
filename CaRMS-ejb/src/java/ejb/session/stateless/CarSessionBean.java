@@ -100,7 +100,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
         } else {
-            throw new CarNotFoundException("Car" + car.getCarId().toString() + " does not exist!");
+            throw new CarNotFoundException("Car " + car.getCarId().toString() + " does not exist!");
         }
     }
 
@@ -111,7 +111,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         if (carToRemove != null) {
             em.remove(carToRemove);
         } else {
-            throw new CarNotFoundException("Car" + carId.toString() + " does not exist!");
+            throw new CarNotFoundException("Car " + carId.toString() + " does not exist!");
         }
     }
 
