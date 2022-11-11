@@ -5,12 +5,11 @@
  */
 package ejb.session.stateless;
 
-import entity.Car;
+import entity.Outlet;
 import java.util.List;
 import javax.ejb.Local;
-import util.exception.CarNotFoundExeception;
-import util.exception.CarPlateExistsException;
 import util.exception.InputDataValidationException;
+import util.exception.OutletNotFoundExeception;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -18,12 +17,12 @@ import util.exception.UnknownPersistenceException;
  * @author tian
  */
 @Local
-public interface CarSessionBeanLocal {
+public interface OutletSessionBeanLocal {
 
-    public Long createNewCar(Car car) throws UnknownPersistenceException, InputDataValidationException, CarPlateExistsException;
+    public Long createNewOutlet(Outlet outlet) throws UnknownPersistenceException, InputDataValidationException;
 
-    public Car retrieveCarById(Long id) throws CarNotFoundExeception;
+    public Outlet retrieveOutletById(Long id) throws OutletNotFoundExeception;
 
-    public List<Car> retrieveAllCars();
-    
+    public List<Outlet> retrieveAllOutlets();
+
 }

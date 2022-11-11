@@ -5,10 +5,9 @@
  */
 package ejb.session.stateless;
 
-import entity.CarModel;
+import entity.Outlet;
 import java.util.List;
 import java.util.Set;
-import util.exception.CarModelNotFoundExeception;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,6 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
+import util.exception.OutletNotFoundExeception;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -26,7 +26,7 @@ import util.exception.UnknownPersistenceException;
  * @author tian
  */
 @Stateless
-public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelSessionBeanLocal {
+public class OutletSessionBean implements OutletSessionBeanRemote, OutletSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -34,20 +34,20 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    public CarModelSessionBean() {
+    public OutletSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
     @Override
-    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException {
-        Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+    public Long createNewOutlet(Outlet outlet) throws UnknownPersistenceException, InputDataValidationException {
+        Set<ConstraintViolation<Outlet>> constraintViolations = validator.validate(outlet);
 
         if (constraintViolations.isEmpty()) {
             try {
-                em.persist(carModel);
+                em.persist(outlet);
                 em.flush();
-                return carModel.getCarModelId();
+                return outlet.getOutletId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                     throw new UnknownPersistenceException(ex.getMessage());
@@ -62,23 +62,23 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundExeception {
-        CarModel carModel = em.find(CarModel.class, id);
-        if (carModel != null) {
-            return carModel;
+    public Outlet retrieveOutletById(Long id) throws OutletNotFoundExeception {
+        Outlet outlet = em.find(Outlet.class, id);
+        if (outlet != null) {
+            return outlet;
         } else {
-            throw new CarModelNotFoundExeception("Car Model " + id.toString() + " does not exist!");
+            throw new OutletNotFoundExeception("Outlet " + id.toString() + " does not exist!");
         }
     }
 
     @Override
-    public List<CarModel> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+    public List<Outlet> retrieveAllOutlets() {
+        Query query = em.createQuery("SELECT o FROM Outlet o");
 
         return query.getResultList();
     }
 
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Outlet>> constraintViolations) {
         String msg = "Input data validation error!:";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {

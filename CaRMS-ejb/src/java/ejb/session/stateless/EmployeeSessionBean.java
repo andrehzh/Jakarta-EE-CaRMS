@@ -5,10 +5,9 @@
  */
 package ejb.session.stateless;
 
-import entity.CarModel;
+import entity.Employee;
 import java.util.List;
 import java.util.Set;
-import util.exception.CarModelNotFoundExeception;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -18,6 +17,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.EmployeeEmailExistsException;
+import util.exception.EmployeeNotFoundExeception;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -26,7 +27,7 @@ import util.exception.UnknownPersistenceException;
  * @author tian
  */
 @Stateless
-public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelSessionBeanLocal {
+public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -34,24 +35,27 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    public CarModelSessionBean() {
+    public EmployeeSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
     @Override
-    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException {
-        Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+    public Long createNewEmployee(Employee employee) throws UnknownPersistenceException, InputDataValidationException, EmployeeEmailExistsException {
+        Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
 
         if (constraintViolations.isEmpty()) {
             try {
-                em.persist(carModel);
+                em.persist(employee);
                 em.flush();
-                return carModel.getCarModelId();
+                return employee.getEmployeeId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                    throw new UnknownPersistenceException(ex.getMessage());
-
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new EmployeeEmailExistsException();
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
                 } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
@@ -62,23 +66,23 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundExeception {
-        CarModel carModel = em.find(CarModel.class, id);
-        if (carModel != null) {
-            return carModel;
+    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundExeception {
+        Employee employee = em.find(Employee.class, id);
+        if (employee != null) {
+            return employee;
         } else {
-            throw new CarModelNotFoundExeception("Car Model " + id.toString() + " does not exist!");
+            throw new EmployeeNotFoundExeception("Employee " + id.toString() + " does not exist!");
         }
     }
 
     @Override
-    public List<CarModel> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+    public List<Employee> retrieveAllEmployees() {
+        Query query = em.createQuery("SELECT e FROM Employee e");
 
         return query.getResultList();
     }
 
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
         String msg = "Input data validation error!:";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {

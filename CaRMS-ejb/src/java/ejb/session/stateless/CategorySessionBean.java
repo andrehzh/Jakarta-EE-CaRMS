@@ -5,10 +5,9 @@
  */
 package ejb.session.stateless;
 
-import entity.CarModel;
+import entity.Category;
 import java.util.List;
 import java.util.Set;
-import util.exception.CarModelNotFoundExeception;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -18,6 +17,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.CategoryNameExistsException;
+import util.exception.CategoryNotFoundExeception;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -26,7 +27,7 @@ import util.exception.UnknownPersistenceException;
  * @author tian
  */
 @Stateless
-public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelSessionBeanLocal {
+public class CategorySessionBean implements CategorySessionBeanRemote, CategorySessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -34,24 +35,27 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    public CarModelSessionBean() {
+    public CategorySessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
     @Override
-    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException {
-        Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+    public Long createNewCategory(Category category) throws UnknownPersistenceException, InputDataValidationException, CategoryNameExistsException {
+        Set<ConstraintViolation<Category>> constraintViolations = validator.validate(category);
 
         if (constraintViolations.isEmpty()) {
             try {
-                em.persist(carModel);
+                em.persist(category);
                 em.flush();
-                return carModel.getCarModelId();
+                return category.getCategoryId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                    throw new UnknownPersistenceException(ex.getMessage());
-
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new CategoryNameExistsException();
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
                 } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
@@ -62,23 +66,23 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundExeception {
-        CarModel carModel = em.find(CarModel.class, id);
-        if (carModel != null) {
-            return carModel;
+    public Category retrieveCategoryById(Long id) throws CategoryNotFoundExeception {
+        Category category = em.find(Category.class, id);
+        if (category != null) {
+            return category;
         } else {
-            throw new CarModelNotFoundExeception("Car Model " + id.toString() + " does not exist!");
+            throw new CategoryNotFoundExeception("Category " + id.toString() + " does not exist!");
         }
     }
 
     @Override
-    public List<CarModel> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+    public List<Category> retrieveAllCategories() {
+        Query query = em.createQuery("SELECT cat FROM Category cat");
 
         return query.getResultList();
     }
 
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Category>> constraintViolations) {
         String msg = "Input data validation error!:";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
