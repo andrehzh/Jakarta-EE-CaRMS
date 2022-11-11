@@ -13,9 +13,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 //really double checking
@@ -51,7 +50,7 @@ public class Car implements Serializable {
     @JoinColumn(nullable = false)
     private Outlet outlet;
     
-    @OneToOne(mappedBy = "car")
+    @OneToMany(mappedBy = "car")
     private Reservation reservation;
     
     

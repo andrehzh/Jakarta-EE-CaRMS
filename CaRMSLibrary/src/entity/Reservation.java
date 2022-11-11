@@ -60,7 +60,7 @@ public class Reservation implements Serializable {
     @OneToMany(mappedBy = "reservation")
     private List<RentalRate> rentalRates;
     
-    @OneToOne(mappedBy = "reservation")
+    @ManyToOne
     private Car car;
     
     @ManyToMany(mappedBy = "reservation")
