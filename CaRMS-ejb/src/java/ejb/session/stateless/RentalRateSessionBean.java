@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -121,6 +122,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         } else {
             throw new RentalRateNotFoundException("RentalRateNotFoundException");
         }
+    }
+
+    @Override
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException {
+        RentalRate rentalRateToRemove = retrieveRentalRateByRentalRateId(rentalRateId);
+
+        //no need to remove from category cause em will do it
+        em.remove(rentalRateToRemove);
+        
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {
