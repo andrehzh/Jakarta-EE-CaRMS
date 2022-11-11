@@ -72,7 +72,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @Override
     public List<RentalRate> retrieveAllRentalRates() {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr");
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.rentalCarCategory, rr.startDateTime ASC");
 
         return query.getResultList();
     }
@@ -125,7 +125,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                 if (rentalRateToUpdate.getRentalRateName().equals(rentalRate.getRentalRateName())) {
                     rentalRateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
                     rentalRateToUpdate.setRentalAmount(rentalRate.getRentalAmount());
-                    rentalRateToUpdate.setCategory(rentalRate.getCategory());
+                    rentalRateToUpdate.setCarCategory(rentalRate.getCarCategory());
                     rentalRateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
                     rentalRateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
                     //  can update everything about a rental rate except name?

@@ -33,7 +33,7 @@ public interface EmployeeSessionBeanLocal {
 
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException;
 
-    public Employee retrieveEmployeeByEmail(String email) throws EmployeeNotFoundException;
+    public Employee retrieveEmployeeByEmployeeEmail(String email) throws EmployeeNotFoundException;
 
     public Employee employeeLogin(String email, String password) throws InvalidLoginCredentialException;
 

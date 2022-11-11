@@ -5,11 +5,13 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CategorySessionBeanRemote;
 import entity.Employee;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import java.util.Scanner;
+import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -22,15 +24,17 @@ public class MainApp {
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private Employee currentEmployee;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private CategorySessionBeanRemote categorySessionBeanRemote;
     private SalesManagementModule salesManagementModule;
 
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
     }
 
     public void runApp() {
@@ -108,17 +112,21 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-//                    cashierOperationModule.menuCashierOperation();
-                } else if (response == 2) {
-//                    try {
-////                        systemAdministrationModule.menuSystemAdministration();
-//                    } catch (InvalidAccessRightException ex) {
-//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-//                    }
-                } else if (response == 3) {
-//                    
-                } else if (response == 4) {
-                    break;
+                    try {
+                        salesManagementModule.menuSalesManagement();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
+//                } else if (response == 2) {
+////                    try {
+//////                        systemAdministrationModule.menuSystemAdministration();
+////                    } catch (InvalidAccessRightException ex) {
+////                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+////                    }
+//                } else if (response == 3) {
+////                    
+//                } else if (response == 4) {
+//                    break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }

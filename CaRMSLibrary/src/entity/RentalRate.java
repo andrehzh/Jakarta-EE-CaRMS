@@ -61,7 +61,7 @@ public class RentalRate implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
-    private Category category;
+    private Category carCategory;
 
     public RentalRate() {
     }
@@ -74,13 +74,13 @@ public class RentalRate implements Serializable {
         this.endDateTime = endDateTime;
     }
 
-    public RentalRate(String rentalRateName, String rentalRateType, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime, Category category) {
+    public RentalRate(String rentalRateName, String rentalCarCategory, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime, Category category) {
         this.rentalRateName = rentalRateName;
-        this.rentalRateType = rentalRateType;
+        this.rentalRateType = rentalCarCategory;
         this.rentalAmount = rentalAmount;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.category = category;
+        this.carCategory = category;
     }
     
     
@@ -122,17 +122,17 @@ public class RentalRate implements Serializable {
     }
 
     /**
-     * @return the category
+     * @return the carCategory
      */
-    public Category getCategory() {
-        return category;
+    public Category getCarCategory() {
+        return carCategory;
     }
 
     /**
-     * @param category the category to set
+     * @param carCategory the carCategory to set
      */
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCarCategory(Category carCategory) {
+        this.carCategory = carCategory;
     }
 
     /**
