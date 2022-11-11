@@ -5,7 +5,7 @@
  */
 package ejb.session.stateless;
 
-import entity.Car;
+import entity.Outlet;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -17,9 +17,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exception.CarNotFoundExeception;
-import util.exception.CarPlateExistsException;
 import util.exception.InputDataValidationException;
+import util.exception.OutletNotFoundExeception;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -27,7 +26,7 @@ import util.exception.UnknownPersistenceException;
  * @author tian
  */
 @Stateless
-public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
+public class OutletSessionBean implements OutletSessionBeanRemote, OutletSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -35,27 +34,24 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    public CarSessionBean() {
+    public OutletSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
     @Override
-    public Long createNewCar(Car car) throws UnknownPersistenceException, InputDataValidationException, CarPlateExistsException {
-        Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
+    public Long createNewOutlet(Outlet outlet) throws UnknownPersistenceException, InputDataValidationException {
+        Set<ConstraintViolation<Outlet>> constraintViolations = validator.validate(outlet);
 
         if (constraintViolations.isEmpty()) {
             try {
-                em.persist(car);
+                em.persist(outlet);
                 em.flush();
-                return car.getCarId();
+                return outlet.getOutletId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                        throw new CarPlateExistsException();
-                    } else {
-                        throw new UnknownPersistenceException(ex.getMessage());
-                    }
+                    throw new UnknownPersistenceException(ex.getMessage());
+
                 } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
@@ -66,23 +62,23 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public Car retrieveCarById(Long id) throws CarNotFoundExeception {
-        Car car = em.find(Car.class, id);
-        if (car != null) {
-            return car;
+    public Outlet retrieveOutletById(Long id) throws OutletNotFoundExeception {
+        Outlet outlet = em.find(Outlet.class, id);
+        if (outlet != null) {
+            return outlet;
         } else {
-            throw new CarNotFoundExeception("Car " + id.toString() + " does not exist!");
+            throw new OutletNotFoundExeception("Outlet " + id.toString() + " does not exist!");
         }
     }
 
     @Override
-    public List<Car> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM Car c");
+    public List<Outlet> retrieveAllOutlets() {
+        Query query = em.createQuery("SELECT o FROM Outlet o");
 
         return query.getResultList();
     }
 
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Outlet>> constraintViolations) {
         String msg = "Input data validation error!:";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
@@ -91,5 +87,4 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
         return msg;
     }
-
 }
