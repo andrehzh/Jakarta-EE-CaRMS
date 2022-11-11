@@ -30,6 +30,6 @@ public interface EmployeeSessionBeanLocal {
 
     public void updateEmployee(Employee employee) throws EmployeeNotFoundException, InputDataValidationException, UpdateEmployeeException;
 
-    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException;
 
 }
