@@ -15,8 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.validation.constraints.NotNull;
 
@@ -43,11 +43,10 @@ public class TransitDriverDispatchRecord implements Serializable {
     @JoinColumn(nullable = false)
     private Employee employee;
 
-    @ManyToMany(mappedBy = "transitRecords")
-    private List<Outlet> outlets;
+    @OneToOne
+    private Outlet outlets;
 
     public TransitDriverDispatchRecord() {
-        outlets = new ArrayList<>();
     }
 
     public TransitDriverDispatchRecord(boolean isCompleted, Date dispatchDate) {
@@ -64,6 +63,20 @@ public class TransitDriverDispatchRecord implements Serializable {
     }
 
     /**
+     * @return the outlets
+     */
+    public Outlet getOutlets() {
+        return outlets;
+    }
+
+    /**
+     * @param outlets the outlets to set
+     */
+    public void setOutlets(Outlet outlets) {
+        this.outlets = outlets;
+    }
+
+    /**
      * @return the employee
      */
     public Employee getEmployee() {
@@ -75,20 +88,6 @@ public class TransitDriverDispatchRecord implements Serializable {
      */
     public void setEmployee(Employee employee) {
         this.employee = employee;
-    }
-
-    /**
-     * @return the outlets
-     */
-    public List<Outlet> getOutlets() {
-        return outlets;
-    }
-
-    /**
-     * @param outlets the outlets to set
-     */
-    public void setOutlets(List<Outlet> outlets) {
-        this.outlets = outlets;
     }
 
     @Override

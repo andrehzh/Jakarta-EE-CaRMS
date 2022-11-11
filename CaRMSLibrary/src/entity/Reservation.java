@@ -54,16 +54,16 @@ public class Reservation implements Serializable {
     @ManyToOne
     private OwnCustomer ownCustomer;
     
-    @OneToOne(mappedBy = "reservation")
+    @OneToOne
     private ReservationTransaction reservationTransaction;
     
-    @OneToMany(mappedBy = "reservation")
+    @OneToMany
     private List<RentalRate> rentalRates;
     
     @ManyToOne
     private Car car;
     
-    @ManyToMany(mappedBy = "reservation")
+    @ManyToMany
     @JoinColumn(nullable = false)
     private List<Outlet> outlets;
 

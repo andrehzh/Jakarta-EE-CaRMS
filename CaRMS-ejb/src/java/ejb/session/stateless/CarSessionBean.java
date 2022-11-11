@@ -108,7 +108,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException {
         Car carToRemove = retrieveCarById(carId);
-        if (carToRemove.getReservation() != null) {
+        if (carToRemove.getReservations().isEmpty()) {
             throw new DeleteCarException("Car " + carId.toString() + " is associated with an existing reservation and cannot be deleted!");
         } else {
             em.remove(carToRemove);

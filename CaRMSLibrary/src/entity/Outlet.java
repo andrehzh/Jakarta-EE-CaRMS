@@ -8,7 +8,6 @@ package entity;
 import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -42,18 +41,17 @@ public class Outlet implements Serializable {
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
     
-    @ManyToMany(mappedBy = "outlets")
-    private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
+    @OneToOne(mappedBy = "outlets")
+    private TransitDriverDispatchRecord transitDriverDispatchRecord;
     
     @ManyToMany(mappedBy = "outlets")
     private List<Reservation> reservations;
     
-    @OneToMany(mappedBy = "cars")
+    @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
 
     public Outlet() {
         employees = new ArrayList<>();
-        transitDriverDispatchRecords = new ArrayList<>();
         reservations = new ArrayList<>();
         cars = new ArrayList<>();
     }
@@ -75,6 +73,20 @@ public class Outlet implements Serializable {
     }
 
     /**
+     * @return the transitDriverDispatchRecord
+     */
+    public TransitDriverDispatchRecord getTransitDriverDispatchRecord() {
+        return transitDriverDispatchRecord;
+    }
+
+    /**
+     * @param transitDriverDispatchRecord the transitDriverDispatchRecord to set
+     */
+    public void setTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) {
+        this.transitDriverDispatchRecord = transitDriverDispatchRecord;
+    }
+
+    /**
      * @return the employees
      */
     public List<Employee> getEmployees() {
@@ -86,20 +98,6 @@ public class Outlet implements Serializable {
      */
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
-    }
-
-    /**
-     * @return the transitDriverDispatchRecords
-     */
-    public List<TransitDriverDispatchRecord> getTransitDriverDispatchRecords() {
-        return transitDriverDispatchRecords;
-    }
-
-    /**
-     * @param transitDriverDispatchRecords the transitDriverDispatchRecords to set
-     */
-    public void setTransitDriverDispatchRecords(List<TransitDriverDispatchRecord> transitDriverDispatchRecords) {
-        this.transitDriverDispatchRecords = transitDriverDispatchRecords;
     }
 
     /**

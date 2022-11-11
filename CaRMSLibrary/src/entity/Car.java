@@ -7,6 +7,7 @@ package entity;
 
 import util.enumeration.CarStatusEnum;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -51,7 +52,7 @@ public class Car implements Serializable {
     private Outlet outlet;
     
     @OneToMany(mappedBy = "car")
-    private Reservation reservation;
+    private List<Reservation> reservations;
     
     
 
@@ -70,6 +71,20 @@ public class Car implements Serializable {
 
     public void setCarId(Long carId) {
         this.carId = carId;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
     /**
@@ -98,20 +113,6 @@ public class Car implements Serializable {
      */
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
-    }
-
-    /**
-     * @return the reservation
-     */
-    public Reservation getReservation() {
-        return reservation;
-    }
-
-    /**
-     * @param reservation the reservation to set
-     */
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
     }
 
     @Override
