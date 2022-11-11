@@ -9,8 +9,10 @@ import entity.CarModel;
 import java.util.List;
 import util.exception.CarModelNotFoundException;
 import javax.ejb.Local;
+import util.exception.DeleteCarModelException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCarModelException;
 
 /**
  *
@@ -25,7 +27,7 @@ public interface CarModelSessionBeanLocal {
 
     public List<CarModel> retrieveAllCarModels();
 
-    public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException;
+    public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException, UpdateCarModelException;
 
-    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
+    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException, DeleteCarModelException;
 }

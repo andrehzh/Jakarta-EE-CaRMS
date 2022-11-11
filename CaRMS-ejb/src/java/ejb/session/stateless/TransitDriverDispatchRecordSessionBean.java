@@ -17,9 +17,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteTransitDriverDispatchRecordException;
 import util.exception.InputDataValidationException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
@@ -79,16 +81,18 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
 
     @Override
-    public void updateTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, InputDataValidationException //, UpdateTransitDriverDispatchRecordException 
-    {
+    public void updateTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, InputDataValidationException, UpdateTransitDriverDispatchRecordException {
         if (transitDriverDispatchRecord != null && transitDriverDispatchRecord.getTransitDriverDispatchRecordId() != null) {
             Set<ConstraintViolation<TransitDriverDispatchRecord>> constraintViolations = validator.validate(transitDriverDispatchRecord);
 
             if (constraintViolations.isEmpty()) {
                 TransitDriverDispatchRecord transitDriverDispatchRecordToUpdate = retrieveTransitDriverDispatchRecordById(transitDriverDispatchRecord.getTransitDriverDispatchRecordId());
-
-                transitDriverDispatchRecordToUpdate.setDispatchDate(transitDriverDispatchRecord.getDispatchDate());
-                transitDriverDispatchRecordToUpdate.setIsCompleted(transitDriverDispatchRecord.isIsCompleted());
+                try {
+                    transitDriverDispatchRecordToUpdate.setDispatchDate(transitDriverDispatchRecord.getDispatchDate());
+                    transitDriverDispatchRecordToUpdate.setIsCompleted(transitDriverDispatchRecord.isIsCompleted());
+                } catch (PersistenceException ex) {
+                    throw new UpdateTransitDriverDispatchRecordException("UpdateTransitDriverDispatchRecordException");
+                }
 
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -99,13 +103,13 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
 
     @Override
-    public void deleteTransitDriverDispatchRecord(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException //, DeleteTransitDriverDispatchRecordException
-    {
+    public void deleteTransitDriverDispatchRecord(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, DeleteTransitDriverDispatchRecordException {
         TransitDriverDispatchRecord transitDriverDispatchRecordToRemove = retrieveTransitDriverDispatchRecordById(transitDriverDispatchRecordId);
-        if (transitDriverDispatchRecordToRemove != null) {
+        try {
             em.remove(transitDriverDispatchRecordToRemove);
-        } else {
-            throw new TransitDriverDispatchRecordNotFoundException("Transit Driver Dispatch Record " + transitDriverDispatchRecordId.toString() + " does not exist!");
+            return;
+        } catch (PersistenceException ex) {
+            throw new DeleteTransitDriverDispatchRecordException("DeleteTransitDriverDispatchRecordException");
         }
     }
 

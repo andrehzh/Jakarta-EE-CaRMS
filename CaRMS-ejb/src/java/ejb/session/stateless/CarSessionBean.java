@@ -19,6 +19,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CarNotFoundException;
 import util.exception.CarPlateExistsException;
+import util.exception.DeleteCarException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCarException;
@@ -105,13 +106,12 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public void deleteCar(Long carId) throws CarNotFoundException //, DeleteCarException
-    {
+    public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException {
         Car carToRemove = retrieveCarById(carId);
-        if (carToRemove != null) {
-            em.remove(carToRemove);
+        if (carToRemove.getReservation() != null) {
+            throw new DeleteCarException("Car " + carId.toString() + " is associated with an existing reservation and cannot be deleted!");
         } else {
-            throw new CarNotFoundException("Car " + carId.toString() + " does not exist!");
+            em.remove(carToRemove);
         }
     }
 

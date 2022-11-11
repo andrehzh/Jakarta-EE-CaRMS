@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CategoryNameExistsException;
 import util.exception.CategoryNotFoundException;
+import util.exception.DeleteCategoryException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCategoryException;
@@ -29,6 +30,6 @@ public interface CategorySessionBeanRemote {
 
     public void updateCategory(Category category) throws CategoryNotFoundException, InputDataValidationException, UpdateCategoryException;
 
-    public void deleteCategory(Long categoryId) throws CategoryNotFoundException;
+    public void deleteCategory(Long categoryId) throws CategoryNotFoundException, DeleteCategoryException;
 
 }

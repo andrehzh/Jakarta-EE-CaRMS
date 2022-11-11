@@ -19,6 +19,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CategoryNameExistsException;
 import util.exception.CategoryNotFoundException;
+import util.exception.DeleteCategoryException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCategoryException;
@@ -104,13 +105,14 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
     }
 
     @Override
-    public void deleteCategory(Long categoryId) throws CategoryNotFoundException //, DeleteCategoryException
-    {
+    public void deleteCategory(Long categoryId) throws CategoryNotFoundException, DeleteCategoryException {
         Category categoryToRemove = retrieveCategoryById(categoryId);
-        if (categoryToRemove != null) {
-            em.remove(categoryToRemove);
+        if (!categoryToRemove.getRentalRates().isEmpty()) {
+            throw new DeleteCategoryException("Category " + categoryId.toString() + " is associated with existing rental rate(s) and cannot be deleted!");
+        } else if (!categoryToRemove.getCarModels().isEmpty()) {
+            throw new DeleteCategoryException("Category " + categoryId.toString() + " is associated with existing car model(s) and cannot be deleted!");
         } else {
-            throw new CategoryNotFoundException("Category " + categoryId.toString() + " does not exist!");
+            em.remove(categoryToRemove);
         }
     }
 

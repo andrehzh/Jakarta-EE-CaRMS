@@ -8,9 +8,11 @@ package ejb.session.stateless;
 import entity.TransitDriverDispatchRecord;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.DeleteTransitDriverDispatchRecordException;
 import util.exception.InputDataValidationException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
@@ -25,8 +27,8 @@ public interface TransitDriverDispatchRecordSessionBeanLocal {
 
     public List<TransitDriverDispatchRecord> retrieveAllTransitDriverDispatchRecords();
 
-    public void updateTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, InputDataValidationException;
+    public void updateTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, InputDataValidationException, UpdateTransitDriverDispatchRecordException;
 
-    public void deleteTransitDriverDispatchRecord(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
+    public void deleteTransitDriverDispatchRecord(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, DeleteTransitDriverDispatchRecordException;
 
 }
