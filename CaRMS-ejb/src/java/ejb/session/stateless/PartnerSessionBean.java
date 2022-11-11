@@ -71,7 +71,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
 
     @Override
     public List<Partner> retrieveAllPartners() {
-        Query query = em.createQuery("SELECT c FROM Partner c");
+        Query query = em.createQuery("SELECT p FROM Partner p");
 
         return query.getResultList();
     }
@@ -114,11 +114,10 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     public void deletePartner(Long partnerId) throws PartnerNotFoundException, DeletePartnerException {
         Partner partnerToRemove = retrievePartnerByPartnerId(partnerId);
         //remove partner considerations idk need see logical data model.
-        if (partnerToRemove.getCustomers().isEmpty() && partnerToRemove.getReservations().isEmpty()) {
+        if (partnerToRemove.getCustomers().isEmpty()) {
             em.remove(partnerToRemove);
         } else {
-            // New in v4.1 to prevent deleting staff with existing sale transaction(s)
-            throw new DeletePartnerException("Partner ID " + partnerId + " is associated with existing customers & reservations and cannot be deleted!");
+            throw new DeletePartnerException("Partner ID " + partnerId + " is associated with existing reservations and cannot be deleted!");
         }
     }
 

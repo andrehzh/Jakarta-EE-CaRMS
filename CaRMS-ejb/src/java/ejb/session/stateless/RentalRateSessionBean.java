@@ -20,7 +20,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exception.DeleteCreditCardException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
@@ -72,7 +71,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @Override
     public List<RentalRate> retrieveAllRentalRates() {
-        Query query = em.createQuery("SELECT r FROM RentalRate r");
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr");
 
         return query.getResultList();
     }

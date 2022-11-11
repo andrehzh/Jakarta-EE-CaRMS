@@ -5,9 +5,10 @@
  */
 package ejb.session.stateless;
 
-import entity.Customer;
+import entity.OwnCustomer;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -29,7 +30,7 @@ import util.exception.UpdateCustomerException;
  * @author andre
  */
 @Stateless
-public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
+public class OwnCustomerSessionBean implements OwnCustomerSessionBeanRemote, OwnCustomerSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -39,21 +40,23 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    public CustomerSessionBean() {
+    public OwnCustomerSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
-
+    
+    
     @Override
-    public Long createNewCustomer(Customer newCustomer) throws CustomerEmailExistException, UnknownPersistenceException, InputDataValidationException {
-        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(newCustomer);
-
+    public Long createNewOwnCustomer(OwnCustomer newOwnCustomer) throws CustomerEmailExistException, UnknownPersistenceException, InputDataValidationException {
+        Set<ConstraintViolation<OwnCustomer>> constraintViolations = validator.validate(newOwnCustomer);
+        
         if (constraintViolations.isEmpty()) {
             try {
-                em.persist(newCustomer);
+                em.persist(newOwnCustomer);
                 em.flush();
-
-                return newCustomer.getCustomerId();
+                
+                //sub class things
+                return newOwnCustomer.getCustomerId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                     if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
@@ -69,39 +72,40 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
-
+    
     @Override
-    public List<Customer> retrieveAllCustomers() {
-        Query query = em.createQuery("SELECT c FROM Customer c");
-
+    public List<OwnCustomer> retrieveAllOwnCustomers() {
+        Query query = em.createQuery("SELECT oc FROM OwnCustomer oc");
+        
         return query.getResultList();
     }
-
+    
     @Override
-    public Customer retrieveCustomerByCustomerId(Long customerId) throws CustomerNotFoundException {
-        Customer customer = em.find(Customer.class, customerId);
-
-        if (customer != null) {
-            return customer;
+    public OwnCustomer retrieveOwnCustomerByCustomerId(Long ownCustomerId) throws CustomerNotFoundException {
+        OwnCustomer ownCustomer = em.find(OwnCustomer.class, ownCustomerId);
+        
+        if (ownCustomer != null) {
+            return ownCustomer;
         } else {
-            throw new CustomerNotFoundException("Customer ID " + customerId + " does not exist!");
+            throw new CustomerNotFoundException("Own Customer ID " + ownCustomerId + " does not exist!");
         }
     }
-
+    
     @Override
-    public void updateCustomer(Customer customer) throws CustomerNotFoundException, UpdateCustomerException, InputDataValidationException {
-        if (customer != null && customer.getCustomerId() != null) {
-            Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
-
+    public void updateOwnCustomer(OwnCustomer ownCustomer) throws CustomerNotFoundException, UpdateCustomerException, InputDataValidationException {
+        if (ownCustomer != null && ownCustomer.getCustomerId() != null) {
+            Set<ConstraintViolation<OwnCustomer>> constraintViolations = validator.validate(ownCustomer);
+            
             if (constraintViolations.isEmpty()) {
-                Customer customerToUpdate = retrieveCustomerByCustomerId(customer.getCustomerId());
-
-                if (customerToUpdate.getCustomerEmail().equals(customer.getCustomerEmail())) {
-                    customerToUpdate.setCreditCard(customer.getCreditCard());
-                    customerToUpdate.setCustomerName(customer.getCustomerName());
-                    customerToUpdate.setCustomerPhoneNum(customer.getCustomerPhoneNum());
-                    customerToUpdate.setPartner(customer.getPartner());
-                    // able to update everything except email cause unique
+                OwnCustomer ownCustomerToUpdate = retrieveOwnCustomerByCustomerId(ownCustomer.getCustomerId());
+                
+                if (ownCustomerToUpdate.getPassportNumber().equals(ownCustomer.getPassportNumber())) {
+                    ownCustomerToUpdate.setCreditCard(ownCustomer.getCreditCard());
+                    ownCustomerToUpdate.setCustomerEmail(ownCustomer.getCustomerEmail());
+                    ownCustomerToUpdate.setCustomerName(ownCustomer.getCustomerName());
+                    ownCustomerToUpdate.setCustomerPassword(ownCustomer.getCustomerPassword());
+                    ownCustomerToUpdate.setCustomerPhoneNum(ownCustomer.getCustomerPhoneNum());
+                    // able to update everything except partner cause no partner
                 } else {
                     throw new UpdateCustomerException("UpdateCustomerException");
                 }
@@ -112,27 +116,28 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new CustomerNotFoundException("CustomerNotFoundException");
         }
     }
-
+    
     @Override
-    public void deleteCustomer(Long customerId) throws CustomerNotFoundException, DeleteCustomerException {
-        Customer customerToRemove = retrieveCustomerByCustomerId(customerId);
-        //if remove customer need to remove credit card also.
-        if (customerToRemove.getCreditCard() == null) {
-            em.remove(customerToRemove);
+    public void deleteOwnCustomer(Long ownCustomerId) throws CustomerNotFoundException, DeleteCustomerException {
+        OwnCustomer ownCustomerToRemove = retrieveOwnCustomerByCustomerId(ownCustomerId);
+        //if remove OwnCustomer need to remove credit card also.
+        if (ownCustomerToRemove.getCreditCard()==null) {
+            em.remove(ownCustomerToRemove);
         } else {
             // New in v4.1 to prevent deleting staff with existing sale transaction(s)
-            throw new DeleteCustomerException("Customer ID " + customerId + " is associated with existing credit card and cannot be deleted!");
+            throw new DeleteCustomerException("Customer ID " + ownCustomerId + "cannot be deleted!");
         }
     }
-
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Customer>> constraintViolations) {
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<OwnCustomer>> constraintViolations) {
         String msg = "Input data validation error!:";
-
+        
         for (ConstraintViolation constraintViolation : constraintViolations) {
             msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
         }
-
+        
         return msg;
     }
-
+    
 }
+
