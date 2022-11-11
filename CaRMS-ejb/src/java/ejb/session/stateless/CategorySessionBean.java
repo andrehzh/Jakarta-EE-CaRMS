@@ -21,6 +21,7 @@ import util.exception.CategoryNameExistsException;
 import util.exception.CategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCategoryException;
 
 /**
  *
@@ -80,6 +81,37 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         Query query = em.createQuery("SELECT cat FROM Category cat");
 
         return query.getResultList();
+    }
+
+    @Override
+    public void updateCategory(Category category) throws CategoryNotFoundException, InputDataValidationException, UpdateCategoryException {
+        if (category != null && category.getCategoryId() != null) {
+            Set<ConstraintViolation<Category>> constraintViolations = validator.validate(category);
+
+            if (constraintViolations.isEmpty()) {
+                Category categoryToUpdate = retrieveCategoryById(category.getCategoryId());
+                if (categoryToUpdate.getCategoryName().equals(category.getCategoryName())) {
+                    categoryToUpdate.setCategoryDesc(category.getCategoryDesc());
+                } else {
+                    throw new UpdateCategoryException("UpdateCategoryException");
+                }
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new CategoryNotFoundException("Category" + category.getCategoryId().toString() + " does not exist!");
+        }
+    }
+
+    @Override
+    public void deleteCategory(Long categoryId) throws CategoryNotFoundException //, DeleteCategoryException
+    {
+        Category categoryToRemove = retrieveCategoryById(categoryId);
+        if (categoryToRemove != null) {
+            em.remove(categoryToRemove);
+        } else {
+            throw new CategoryNotFoundException("Category " + categoryId.toString() + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Category>> constraintViolations) {
