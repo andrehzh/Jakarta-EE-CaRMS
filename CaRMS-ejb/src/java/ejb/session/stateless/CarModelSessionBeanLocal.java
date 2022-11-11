@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
+import entity.RentalRate;
+import java.util.List;
 import util.exception.CarModelNotFoundExeception;
 import javax.ejb.Local;
 
@@ -16,7 +18,9 @@ import javax.ejb.Local;
 @Local
 public interface CarModelSessionBeanLocal {
 
-    public CarModel createNewCarModel(CarModel carModel);
+    public Long createNewCarModel(CarModel carModel);
     
     public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundExeception;
+    
+    public List<CarModel> retrieveAllCarModels();
 }

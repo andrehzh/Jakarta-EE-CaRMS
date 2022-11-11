@@ -6,11 +6,20 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
+import java.util.List;
+import java.util.Set;
 import util.exception.CarModelNotFoundExeception;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -22,17 +31,33 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
     public CarModelSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
-    public CarModel createNewCarModel(CarModel carModel) {
-        try {
-            em.persist(carModel);
-            em.flush();
-            return carModel;
-        } catch (PersistenceException ex) {
-            return null;
-            //throw exception error handling
+    @Override
+    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException {
+        Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+                em.persist(carModel);
+                em.flush();
+                return carModel.getCarModelId();
+            } catch (PersistenceException ex) {
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    throw new UnknownPersistenceException(ex.getMessage());
+
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
 
@@ -46,4 +71,42 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         }
     }
 
+    @Override
+    public List<CarModel> retrieveAllCarModels() {
+        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+
+        return query.getResultList();
+    }
+
+//    @Override
+//    public void updateCarModel(CarModel carModel) throws CarModelNotFoundExeception, UpdateCarModelException, InputDataValidationException {
+//        if (carModel != null && carModel.getCarModelId() != null) {
+//            Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
+//
+//            if (constraintViolations.isEmpty()) {
+//                CarModel carModelToUpdate = retrieveCarModelById(carModel.getCarModelId());
+//
+//                if (carModelToUpdate.getRentalRateName().equals(rentalRate.getRentalRateName())) {
+//                    carModelToUpdate.setRentalAmount(rentalRate.getRentalAmount());
+//                    carModelToUpdate.setCategory(rentalRate.getCategory());
+//                    carModelToUpdate.setRentalDate(rentalRate.getRentalDate());
+//                } else {
+//                    throw new UpdateRentalRateException("UpdateRentalRateException");
+//                }
+//            } else {
+//                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+//            }
+//        } else {
+//            throw new RentalRateNotFoundException("RentalRateNotFoundException");
+//        }
+//    }
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
 }
