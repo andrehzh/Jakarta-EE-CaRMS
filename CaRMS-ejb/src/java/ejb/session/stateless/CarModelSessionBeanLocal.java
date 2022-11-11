@@ -9,6 +9,7 @@ import entity.CarModel;
 import java.util.List;
 import util.exception.CarModelNotFoundException;
 import javax.ejb.Local;
+import util.exception.CarModelNameExistException;
 import util.exception.DeleteCarModelException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
@@ -21,7 +22,7 @@ import util.exception.UpdateCarModelException;
 @Local
 public interface CarModelSessionBeanLocal {
 
-    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException;
+    public Long createNewCarModel(CarModel carModel) throws CarModelNameExistException, UnknownPersistenceException, InputDataValidationException;
 
     public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundException;
 

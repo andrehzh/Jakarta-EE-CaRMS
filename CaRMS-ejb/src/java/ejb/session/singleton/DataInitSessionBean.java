@@ -31,6 +31,7 @@ import javax.ejb.Startup;
 import javax.persistence.PersistenceException;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeAccessRightEnum;
+import util.exception.CarModelNameExistException;
 import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.CarPlateExistsException;
@@ -39,6 +40,7 @@ import util.exception.CategoryNotFoundException;
 import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.OutletNameExistException;
 import util.exception.OutletNotFoundException;
 import util.exception.PartnerNameExistException;
 import util.exception.RentalRateNotFoundException;
@@ -184,7 +186,7 @@ public class DataInitSessionBean {
 
             partnerSessionBeanLocal.createNewPartner(new Partner("Holiday.com"));
             //} catch (CategoryNotFoundException | RentalRateNotFoundException | CarNotFoundException | CarModelNotFoundException | OutletNotFoundException | CarPlateExistsException | UnknownPersistenceException | PersistenceException | InputDataValidationException ex) {
-        } catch (CategoryNotFoundException | RentalRateNotFoundException | CarNotFoundException | CarModelNotFoundException | OutletNotFoundException | EmployeeNotFoundException | PartnerNameExistException | CarPlateExistsException | CategoryNameExistsException | EmployeeEmailExistsException | UnknownPersistenceException | PersistenceException | InputDataValidationException ex) {
+        } catch ( CarModelNameExistException | OutletNameExistException | CategoryNotFoundException | RentalRateNotFoundException | CarNotFoundException | CarModelNotFoundException | OutletNotFoundException | EmployeeNotFoundException | PartnerNameExistException | CarPlateExistsException | CategoryNameExistsException | EmployeeEmailExistsException | UnknownPersistenceException | PersistenceException | InputDataValidationException ex) {
             ex.printStackTrace();
         }
     }

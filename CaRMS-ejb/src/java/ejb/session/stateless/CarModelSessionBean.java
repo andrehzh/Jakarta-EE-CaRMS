@@ -18,6 +18,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.CarModelNameExistException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 import util.exception.DeleteCarModelException;
@@ -42,7 +43,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException {
+    public Long createNewCarModel(CarModel carModel) throws CarModelNameExistException, UnknownPersistenceException, InputDataValidationException {
         Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
 
         if (constraintViolations.isEmpty()) {
@@ -52,8 +53,11 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
                 return carModel.getCarModelId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                    throw new UnknownPersistenceException(ex.getMessage());
-
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                        throw new CarModelNameExistException();
+                    } else {
+                        throw new UnknownPersistenceException(ex.getMessage());
+                    }
                 } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
