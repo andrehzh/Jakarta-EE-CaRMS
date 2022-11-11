@@ -5,7 +5,7 @@
  */
 package entity;
 
-import enumerations.CarStatusEnum;
+import util.enumeration.CarStatusEnum;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
