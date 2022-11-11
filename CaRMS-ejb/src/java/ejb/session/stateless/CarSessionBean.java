@@ -94,13 +94,13 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                     carToUpdate.setCarColor(car.getCarColor());
                     carToUpdate.setCarStatus(car.getCarStatus());
                 } else {
-                    throw new UpdateCarException("UpdateRentalRateException");
+                    throw new UpdateCarException("UpdateCarException");
                 }
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
         } else {
-            throw new CarNotFoundException("Car Model " + car.getCarId().toString() + " does not exist!");
+            throw new CarNotFoundException("Car" + car.getCarId().toString() + " does not exist!");
         }
     }
 
@@ -111,7 +111,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         if (carToRemove != null) {
             em.remove(carToRemove);
         } else {
-            throw new CarNotFoundException("Car Model " + carId.toString() + " does not exist!");
+            throw new CarNotFoundException("Car" + carId.toString() + " does not exist!");
         }
     }
 
