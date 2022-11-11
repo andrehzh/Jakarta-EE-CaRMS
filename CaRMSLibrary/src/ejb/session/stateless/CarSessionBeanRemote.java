@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarNotFoundException;
 import util.exception.CarPlateExistsException;
+import util.exception.DeleteCarException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCarException;
@@ -29,6 +30,6 @@ public interface CarSessionBeanRemote {
 
     public void updateCar(Car car) throws CarNotFoundException, InputDataValidationException, UpdateCarException;
 
-    public void deleteCar(Long carId) throws CarNotFoundException;
+    public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException;
 
 }

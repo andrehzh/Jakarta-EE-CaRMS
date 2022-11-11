@@ -11,6 +11,7 @@ import javax.ejb.Remote;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateOutletException;
 
 /**
  *
@@ -25,7 +26,7 @@ public interface OutletSessionBeanRemote {
 
     public List<Outlet> retrieveAllOutlets();
 
-    public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException;
+    public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException, UpdateOutletException;
 
     public void deleteOutlet(Long outletId) throws OutletNotFoundException;
 

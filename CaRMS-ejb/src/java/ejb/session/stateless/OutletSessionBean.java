@@ -20,6 +20,7 @@ import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateOutletException;
 
 /**
  *
@@ -79,18 +80,19 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     }
 
     @Override
-    public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException //, UpdateOutletException 
-    {
+    public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException, UpdateOutletException {
         if (outlet != null && outlet.getOutletId() != null) {
             Set<ConstraintViolation<Outlet>> constraintViolations = validator.validate(outlet);
 
             if (constraintViolations.isEmpty()) {
                 Outlet outletToUpdate = retrieveOutletById(outlet.getOutletId());
-
-                outletToUpdate.setOutletName(outlet.getOutletName());
-                outletToUpdate.setOpeningTime(outlet.getOpeningTime());
-                outletToUpdate.setClosingTime(outlet.getClosingTime());
-
+                try {
+                    outletToUpdate.setOutletName(outlet.getOutletName());
+                    outletToUpdate.setOpeningTime(outlet.getOpeningTime());
+                    outletToUpdate.setClosingTime(outlet.getClosingTime());
+                } catch (PersistenceException ex) {
+                    throw new UpdateOutletException("UpdateOutletException");
+                }
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }

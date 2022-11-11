@@ -20,6 +20,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.DeleteCarModelException;
+import util.exception.UpdateCarModelException;
 
 /**
  *
@@ -79,15 +81,18 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException //, UpdateCarModelException
-    {
+    public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException, UpdateCarModelException {
         if (carModel != null && carModel.getCarModelId() != null) {
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
 
             if (constraintViolations.isEmpty()) {
                 CarModel carModelToUpdate = retrieveCarModelById(carModel.getCarModelId());
-                carModelToUpdate.setCarModelBrand(carModel.getCarModelBrand());
-                carModelToUpdate.setCarModelName(carModel.getCarModelName());
+                try {
+                    carModelToUpdate.setCarModelBrand(carModel.getCarModelBrand());
+                    carModelToUpdate.setCarModelName(carModel.getCarModelName());
+                } catch (PersistenceException ex) {
+                    throw new UpdateCarModelException("UpdateCarModelException");
+                }
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
@@ -97,13 +102,12 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
-    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException //, DeleteCarModelException
-    {
+    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException, DeleteCarModelException {
         CarModel carModelToRemove = retrieveCarModelById(carModelId);
-        if (carModelToRemove != null) {
+        if (carModelToRemove.getCars().isEmpty()) {
             em.remove(carModelToRemove);
         } else {
-            throw new CarModelNotFoundException("Car Model " + carModelId.toString() + " does not exist!");
+            throw new DeleteCarModelException("Car Model " + carModelId.toString() + " is associated with existing car(s) and cannot be deleted!");
         }
     }
 

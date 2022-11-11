@@ -10,8 +10,10 @@ import entity.RentalRate;
 import java.util.List;
 import util.exception.CarModelNotFoundException;
 import javax.ejb.Remote;
+import util.exception.DeleteCarModelException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCarModelException;
 
 /**
  *
@@ -20,13 +22,13 @@ import util.exception.UnknownPersistenceException;
 @Remote
 public interface CarModelSessionBeanRemote {
 
-    Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException;
+    public Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException;
 
-    CarModel retrieveCarModelById(Long id) throws CarModelNotFoundException;
+    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundException;
 
-    List<CarModel> retrieveAllCarModels();
+    public List<CarModel> retrieveAllCarModels();
 
-    void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException;
+    public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException, UpdateCarModelException;
 
-    void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
+    public void deleteCarModel(Long carModelId) throws CarModelNotFoundException, DeleteCarModelException;
 }

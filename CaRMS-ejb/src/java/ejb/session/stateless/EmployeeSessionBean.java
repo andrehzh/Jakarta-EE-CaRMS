@@ -17,6 +17,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteEmployeeException;
+import util.exception.DeleteEmployeeException;
 import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
@@ -106,13 +108,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
 
     @Override
-    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException //, DeleteEmployeeException
-    {
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException {
         Employee employeeToRemove = retrieveEmployeeById(employeeId);
-        if (employeeToRemove != null) {
-            em.remove(employeeToRemove);
+        if (!employeeToRemove.getTransitDriverDispatchRecords().isEmpty()) {
+            throw new DeleteEmployeeException("Employee " + employeeId.toString() + " is associated with existing Transit Driver Dispatch Record(s) and cannot be deleted!");
         } else {
-            throw new EmployeeNotFoundException("Employee " + employeeId.toString() + " does not exist!");
+            em.remove(employeeToRemove);
         }
     }
 
