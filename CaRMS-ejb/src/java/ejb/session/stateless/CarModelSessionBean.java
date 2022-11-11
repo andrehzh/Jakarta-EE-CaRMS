@@ -83,8 +83,8 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @Override
     public CarModel retrieveCarModelByCarModelName(String carModelName) throws CarModelNotFoundException {
         try {
-            Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.outletName = :inOutletName");
-            query.setParameter("inOutletName", carModelName);
+            Query query = em.createQuery("SELECT cm FROM CarModel cm WHERE cm.carModelName = :inModelName");
+            query.setParameter("inModelName", carModelName);
 
             return (CarModel) query.getSingleResult();
         } catch (PersistenceException ex) {

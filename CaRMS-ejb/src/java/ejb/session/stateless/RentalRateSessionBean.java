@@ -91,7 +91,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     //does it match the time stamp?
     @Override
     public List<RentalRate> retrieveRentalRatesByDate(LocalDateTime date) throws RentalRateNotFoundException {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.date = :inDate");
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.startDateTime = :inDate");
         query.setParameter("inDate", date);
 
         try {

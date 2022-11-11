@@ -87,7 +87,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public Car retrieveCarByCarPlate(String carPlate) throws CarNotFoundException {
         try {
-            Query query = em.createQuery("SELECT c FROM Car c WHERE c.carPlate = :inCarPlate");
+            Query query = em.createQuery("SELECT c FROM Car c WHERE c.carPlateNumber = :inCarPlate");
             query.setParameter("inCarPlate", carPlate);
 
             return (Car) query.getSingleResult();
