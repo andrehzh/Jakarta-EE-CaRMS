@@ -60,6 +60,9 @@ public class Reservation implements Serializable {
     @OneToMany(mappedBy = "reservation")
     private List<RentalRate> rentalRates;
     
+    @OneToOne(mappedBy = "reservation")
+    private Car car;
+    
     @ManyToMany(mappedBy = "reservation")
     @JoinColumn(nullable = false)
     private List<Outlet> outlets;
@@ -86,6 +89,20 @@ public class Reservation implements Serializable {
 
     public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
+    }
+
+    /**
+     * @return the car
+     */
+    public Car getCar() {
+        return car;
+    }
+
+    /**
+     * @param car the car to set
+     */
+    public void setCar(Car car) {
+        this.car = car;
     }
 
     

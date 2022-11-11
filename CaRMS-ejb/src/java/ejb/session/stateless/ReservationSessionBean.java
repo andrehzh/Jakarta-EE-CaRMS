@@ -119,11 +119,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public void deleteReservation(Long reservationId) throws ReservationNotFoundException, DeleteReservationException {
         Reservation reservationToRemove = retrieveReservationByReservationId(reservationId);
 
-        try {
+        if (reservationToRemove.getCar() == null) {
             em.remove(reservationToRemove);
-        } catch (PersistenceException ex) {
+        } else {
     
-            throw new DeleteReservationException("Reservation ID " + reservationId + "cannot be deleted!");
+            throw new DeleteReservationException("Reservation ID " + reservationId + "cannot be as there is a car tagged to it deleted!");
         }
     }
     

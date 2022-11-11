@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,14 +36,8 @@ public class Outlet implements Serializable {
     @NotNull
     @Size(min = 1, max = 64)
     private String outletName;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    @Column(nullable = false)
-    @NotNull
-    private Date openingTime;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    @Column(nullable = false)
-    @NotNull
-    private Date closingTime;
+    private Time openingTime;
+    private Time closingTime;
     
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
@@ -63,7 +58,7 @@ public class Outlet implements Serializable {
         cars = new ArrayList<>();
     }
 
-    public Outlet(String outletName, Date openingTime, Date closingTime) {
+    public Outlet(String outletName, Time openingTime, Time closingTime) {
         this();
         
         this.outletName = outletName;
@@ -177,28 +172,28 @@ public class Outlet implements Serializable {
     /**
      * @return the openingTime
      */
-    public Date getOpeningTime() {
+    public Time getOpeningTime() {
         return openingTime;
     }
 
     /**
      * @param openingTime the openingTime to set
      */
-    public void setOpeningTime(Date openingTime) {
+    public void setOpeningTime(Time openingTime) {
         this.openingTime = openingTime;
     }
 
     /**
      * @return the closingTime
      */
-    public Date getClosingTime() {
+    public Time getClosingTime() {
         return closingTime;
     }
 
     /**
      * @param closingTime the closingTime to set
      */
-    public void setClosingTime(Date closingTime) {
+    public void setClosingTime(Time closingTime) {
         this.closingTime = closingTime;
     }
 
