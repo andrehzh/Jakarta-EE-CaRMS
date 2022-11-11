@@ -6,7 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarModel;
-import exceptions.CarModelNotFoundExeception;
+import util.exception.CarModelNotFoundExeception;
 import javax.ejb.Local;
 
 /**

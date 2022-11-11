@@ -3,12 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package enumerations;
+package util.exception;
 
 /**
  *
  * @author tian
  */
-public enum EmployeeAccessRightEnum {
-    SYSTEM_ADMINISTRATOR, EMPLOYEE, SALES_MANAGER, OPS_MANAGER, CS_EXECUTIVE;
+public class CarModelNotFoundExeception extends Exception {
+
+    public CarModelNotFoundExeception() {
+    }
+
+    public CarModelNotFoundExeception(String msg) {
+        super(msg);
+    }
+
 }

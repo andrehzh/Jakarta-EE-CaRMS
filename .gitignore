@@ -5,3 +5,13 @@
 /CaRMSLibrary/nbproject/private/
 /CaRMSSystem/CaRMS-ejb/nbproject/private/
 /CaRMSSystem/nbproject/private/
+/CaRMSLibrary/build/
+/dist/
+/build/
+/CaRMS-ejb/dist/
+/CaRMS-ejb/build/
+/CaRMSManagementClient/dist/
+/CaRMSManagementClient/build/
+/CaRMSLibrary/dist/
+/CaRMSReservationClient/dist/
+/CaRMSReservationClient/build/

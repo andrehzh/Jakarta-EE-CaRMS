@@ -5,7 +5,7 @@
  */
 package entity;
 
-import enumerations.TransactionStatusEnum;
+import util.enumeration.TransactionStatusEnum;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;

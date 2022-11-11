@@ -47,11 +47,11 @@ public class RentalRate implements Serializable {
     @NotNull
     private Date rentalDate;
 
-    @ManyToMany(mappedBy = "rentalRates")
-    private List<Category> categories;
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Category category;
     
     public RentalRate() {
-        categories = new ArrayList<>();
     }
 
     public RentalRate(String rentalRateName, BigDecimal rentalAmount, Date rentalDate) {
@@ -69,18 +69,19 @@ public class RentalRate implements Serializable {
     }
 
     /**
-     * @return the categories
+     * @return the category
      */
-    public List<Category> getCategories() {
-        return categories;
+    public Category getCategory() {
+        return category;
     }
 
     /**
-     * @param categories the categories to set
+     * @param category the category to set
      */
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
+
 
     /**
      * @return the rentalRateName

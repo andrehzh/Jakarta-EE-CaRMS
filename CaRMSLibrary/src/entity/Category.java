@@ -37,7 +37,7 @@ public class Category implements Serializable {
     @NotNull
     private String categoryDesc;
     
-    @ManyToMany(mappedBy = "categories")
+    @OneToMany(mappedBy = "category")
     private List<RentalRate> rentalRates;
     
     @OneToMany(mappedBy = "category")

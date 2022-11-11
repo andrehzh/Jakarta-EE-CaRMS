@@ -88,6 +88,21 @@ public class Reservation implements Serializable {
         this.reservationId = reservationId;
     }
 
+    
+    /**
+     * @return the partner
+     */
+    public Partner getPartner() {
+        return partner;
+    }
+
+    /**
+     * @param partner the partner to set
+     */
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
+    
     /**
      * @return the ownCustomer
      */

@@ -5,7 +5,7 @@
  */
 package entity;
 
-import enumerations.EmployeeAccessRightEnum;
+import util.enumeration.EmployeeAccessRightEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
