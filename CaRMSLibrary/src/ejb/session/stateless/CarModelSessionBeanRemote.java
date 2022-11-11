@@ -8,8 +8,10 @@ package ejb.session.stateless;
 import entity.CarModel;
 import entity.RentalRate;
 import java.util.List;
-import util.exception.CarModelNotFoundExeception;
+import util.exception.CarModelNotFoundException;
 import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -18,9 +20,13 @@ import javax.ejb.Remote;
 @Remote
 public interface CarModelSessionBeanRemote {
 
-    public Long createNewCarModel(CarModel carModel);
-    
-    public CarModel retrieveCarModelById(Long id) throws CarModelNotFoundExeception;
+    Long createNewCarModel(CarModel carModel) throws UnknownPersistenceException, InputDataValidationException;
 
-    public List<CarModel> retrieveAllCarModels();
+    CarModel retrieveCarModelById(Long id) throws CarModelNotFoundException;
+
+    List<CarModel> retrieveAllCarModels();
+
+    void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException;
+
+    void deleteCarModel(Long carModelId) throws CarModelNotFoundException;
 }

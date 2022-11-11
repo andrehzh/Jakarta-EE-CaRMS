@@ -9,12 +9,12 @@ package util.exception;
  *
  * @author tian
  */
-public class EmployeeNotFoundExeception extends Exception {
+public class OutletNotFoundException extends Exception {
 
-    public EmployeeNotFoundExeception() {
+    public OutletNotFoundException() {
     }
 
-    public EmployeeNotFoundExeception(String msg) {
+    public OutletNotFoundException(String msg) {
         super(msg);
     }
 

@@ -18,7 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CategoryNameExistsException;
-import util.exception.CategoryNotFoundExeception;
+import util.exception.CategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -66,12 +66,12 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
     }
 
     @Override
-    public Category retrieveCategoryById(Long id) throws CategoryNotFoundExeception {
+    public Category retrieveCategoryById(Long id) throws CategoryNotFoundException {
         Category category = em.find(Category.class, id);
         if (category != null) {
             return category;
         } else {
-            throw new CategoryNotFoundExeception("Category " + id.toString() + " does not exist!");
+            throw new CategoryNotFoundException("Category " + id.toString() + " does not exist!");
         }
     }
 

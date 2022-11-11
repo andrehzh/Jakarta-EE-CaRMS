@@ -9,7 +9,7 @@ import entity.Outlet;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.InputDataValidationException;
-import util.exception.OutletNotFoundExeception;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -21,7 +21,7 @@ public interface OutletSessionBeanLocal {
 
     public Long createNewOutlet(Outlet outlet) throws UnknownPersistenceException, InputDataValidationException;
 
-    public Outlet retrieveOutletById(Long id) throws OutletNotFoundExeception;
+    public Outlet retrieveOutletById(Long id) throws OutletNotFoundException;
 
     public List<Outlet> retrieveAllOutlets();
 

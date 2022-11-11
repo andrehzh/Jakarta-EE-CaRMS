@@ -9,12 +9,12 @@ package util.exception;
  *
  * @author tian
  */
-public class CategoryNotFoundExeception extends Exception {
+public class EmployeeNotFoundException extends Exception {
 
-    public CategoryNotFoundExeception() {
+    public EmployeeNotFoundException() {
     }
 
-    public CategoryNotFoundExeception(String msg) {
+    public EmployeeNotFoundException(String msg) {
         super(msg);
     }
 
