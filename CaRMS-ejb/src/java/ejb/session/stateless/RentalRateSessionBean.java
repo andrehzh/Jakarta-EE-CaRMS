@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteCreditCardException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
@@ -112,7 +113,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                     rentalRateToUpdate.setRentalAmount(rentalRate.getRentalAmount());
                     rentalRateToUpdate.setCategory(rentalRate.getCategory());
                     rentalRateToUpdate.setRentalDate(rentalRate.getRentalDate());
-                    //  can update everything about a rental rate
+                    //  can update everything about a rental rate except name?
                 } else {
                     throw new UpdateRentalRateException("UpdateRentalRateException");
                 }
@@ -128,9 +129,13 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException {
         RentalRate rentalRateToRemove = retrieveRentalRateByRentalRateId(rentalRateId);
 
-        //no need to remove from category cause em will do it
-        em.remove(rentalRateToRemove);
-        
+        try {
+            //no need to remove from category cause em will do it
+            em.remove(rentalRateToRemove);
+        } catch (PersistenceException ex) {
+            throw new DeleteRentalRateException();
+        }
+
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {
