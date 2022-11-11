@@ -9,9 +9,10 @@ import entity.Employee;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.EmployeeEmailExistsException;
-import util.exception.EmployeeNotFoundExeception;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateEmployeeException;
 
 /**
  *
@@ -22,8 +23,12 @@ public interface EmployeeSessionBeanLocal {
 
     public Long createNewEmployee(Employee employee) throws UnknownPersistenceException, InputDataValidationException, EmployeeEmailExistsException;
 
-    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundExeception;
+    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException;
 
     public List<Employee> retrieveAllEmployees();
+
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, InputDataValidationException, UpdateEmployeeException;
+
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException;
 
 }

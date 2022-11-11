@@ -9,12 +9,12 @@ package util.exception;
  *
  * @author tian
  */
-public class CategoryNotFoundExeception extends Exception {
+public class TransitDriverDispatchRecordNotFoundException extends Exception {
 
-    public CategoryNotFoundExeception() {
+    public TransitDriverDispatchRecordNotFoundException() {
     }
 
-    public CategoryNotFoundExeception(String msg) {
+    public TransitDriverDispatchRecordNotFoundException(String msg) {
         super(msg);
     }
 

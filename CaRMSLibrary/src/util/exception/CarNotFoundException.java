@@ -9,12 +9,12 @@ package util.exception;
  *
  * @author tian
  */
-public class OutletNotFoundExeception extends Exception {
+public class CarNotFoundException extends Exception {
 
-    public OutletNotFoundExeception() {
+    public CarNotFoundException() {
     }
 
-    public OutletNotFoundExeception(String msg) {
+    public CarNotFoundException(String msg) {
         super(msg);
     }
 

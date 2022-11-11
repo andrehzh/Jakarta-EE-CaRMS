@@ -18,7 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
-import util.exception.OutletNotFoundExeception;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -62,12 +62,12 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     }
 
     @Override
-    public Outlet retrieveOutletById(Long id) throws OutletNotFoundExeception {
+    public Outlet retrieveOutletById(Long id) throws OutletNotFoundException {
         Outlet outlet = em.find(Outlet.class, id);
         if (outlet != null) {
             return outlet;
         } else {
-            throw new OutletNotFoundExeception("Outlet " + id.toString() + " does not exist!");
+            throw new OutletNotFoundException("Outlet " + id.toString() + " does not exist!");
         }
     }
 
@@ -76,6 +76,38 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         Query query = em.createQuery("SELECT o FROM Outlet o");
 
         return query.getResultList();
+    }
+
+    @Override
+    public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException //, UpdateOutletException 
+    {
+        if (outlet != null && outlet.getOutletId() != null) {
+            Set<ConstraintViolation<Outlet>> constraintViolations = validator.validate(outlet);
+
+            if (constraintViolations.isEmpty()) {
+                Outlet outletToUpdate = retrieveOutletById(outlet.getOutletId());
+
+                outletToUpdate.setOutletName(outlet.getOutletName());
+                outletToUpdate.setOpeningTime(outlet.getOpeningTime());
+                outletToUpdate.setClosingTime(outlet.getClosingTime());
+
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new OutletNotFoundException("Outlet " + outlet.getOutletId().toString() + " does not exist!");
+        }
+    }
+
+    @Override
+    public void deleteOutlet(Long outletId) throws OutletNotFoundException //, DeleteOutletException
+    {
+        Outlet outletToRemove = retrieveOutletById(outletId);
+        if (outletToRemove != null) {
+            em.remove(outletToRemove);
+        } else {
+            throw new OutletNotFoundException("Outlet " + outletId.toString() + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Outlet>> constraintViolations) {

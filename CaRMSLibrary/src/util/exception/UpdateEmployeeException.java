@@ -9,12 +9,12 @@ package util.exception;
  *
  * @author tian
  */
-public class CarModelNotFoundExeception extends Exception {
+public class UpdateEmployeeException extends Exception {
 
-    public CarModelNotFoundExeception() {
+    public UpdateEmployeeException() {
     }
 
-    public CarModelNotFoundExeception(String msg) {
+    public UpdateEmployeeException(String msg) {
         super(msg);
     }
 

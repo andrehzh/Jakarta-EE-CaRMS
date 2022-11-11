@@ -18,9 +18,10 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.EmployeeEmailExistsException;
-import util.exception.EmployeeNotFoundExeception;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateEmployeeException;
 
 /**
  *
@@ -66,12 +67,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
 
     @Override
-    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundExeception {
+    public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException {
         Employee employee = em.find(Employee.class, id);
         if (employee != null) {
             return employee;
         } else {
-            throw new EmployeeNotFoundExeception("Employee " + id.toString() + " does not exist!");
+            throw new EmployeeNotFoundException("Employee " + id.toString() + " does not exist!");
         }
     }
 
@@ -80,6 +81,39 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         Query query = em.createQuery("SELECT e FROM Employee e");
 
         return query.getResultList();
+    }
+
+    @Override
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, InputDataValidationException, UpdateEmployeeException {
+        if (employee != null && employee.getEmployeeId() != null) {
+            Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
+
+            if (constraintViolations.isEmpty()) {
+                Employee employeeToUpdate = retrieveEmployeeById(employee.getEmployeeId());
+                if (employeeToUpdate.getEmployeeEmail().equals(employee.getEmployeeEmail())) {
+                    employeeToUpdate.setEmployeeName(employee.getEmployeeName());
+                    employeeToUpdate.setEmployeePassword(employee.getEmployeePassword());
+                    employeeToUpdate.setAccessRight(employee.getAccessRight());
+                } else {
+                    throw new UpdateEmployeeException("UpdateEmployeeException");
+                }
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new EmployeeNotFoundException("Employee " + employee.getEmployeeId().toString() + " does not exist!");
+        }
+    }
+
+    @Override
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException //, DeleteEmployeeException
+    {
+        Employee employeeToRemove = retrieveEmployeeById(employeeId);
+        if (employeeToRemove != null) {
+            em.remove(employeeToRemove);
+        } else {
+            throw new EmployeeNotFoundException("Employee " + employeeId.toString() + " does not exist!");
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
