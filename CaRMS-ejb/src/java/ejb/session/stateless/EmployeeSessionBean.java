@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Outlet;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -22,6 +23,7 @@ import util.exception.DeleteEmployeeException;
 import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateEmployeeException;
 
@@ -83,6 +85,19 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         Query query = em.createQuery("SELECT e FROM Employee e");
 
         return query.getResultList();
+    }
+
+    @Override
+    public Employee retrieveEmployeeByEmployeeEmail(String employeeEmail) throws EmployeeNotFoundException {
+        try {
+            Query query = em.createQuery("SELECT e FROM Employee e WHERE e.employeeEmail = :inEmployeeEmail");
+            query.setParameter("inEmployeeEmail", employeeEmail);
+
+            return (Employee) query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw new EmployeeNotFoundException();
+        }
+
     }
 
     @Override

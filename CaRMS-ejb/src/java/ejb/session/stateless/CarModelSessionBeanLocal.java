@@ -30,4 +30,6 @@ public interface CarModelSessionBeanLocal {
     public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException, UpdateCarModelException;
 
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException, DeleteCarModelException;
+
+    public CarModel retrieveCarModelByCarModelName(String carModelName) throws CarModelNotFoundException;
 }

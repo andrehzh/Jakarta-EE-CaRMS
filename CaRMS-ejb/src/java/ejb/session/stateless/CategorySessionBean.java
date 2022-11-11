@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Category;
+import entity.Employee;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -20,6 +21,7 @@ import javax.validation.ValidatorFactory;
 import util.exception.CategoryNameExistsException;
 import util.exception.CategoryNotFoundException;
 import util.exception.DeleteCategoryException;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCategoryException;
@@ -82,6 +84,19 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         Query query = em.createQuery("SELECT cat FROM Category cat");
 
         return query.getResultList();
+    }
+
+    @Override
+    public Category retrieveCategoryByCategoryName(String categoryName) throws CategoryNotFoundException {
+        try {
+            Query query = em.createQuery("SELECT c FROM Category c WHERE c.categoryName = :inCategoryName");
+            query.setParameter("inCategoryName", categoryName);
+
+            return (Category) query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw new CategoryNotFoundException();
+        }
+
     }
 
     @Override

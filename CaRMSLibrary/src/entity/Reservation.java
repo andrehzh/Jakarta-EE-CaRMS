@@ -6,9 +6,9 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,13 +40,13 @@ public class Reservation implements Serializable {
     private String reservationNumber;
     @Column(nullable = false)
     @NotNull
-    private List<Date> reservationDate;
+    private List<LocalDateTime> reservationDate;
     @Column(nullable = false)
     @NotNull
-    private Time pickUpTime;
+    private LocalTime pickUpTime;
     @Column(nullable = false)
     @NotNull
-    private Time dropOffTime;
+    private LocalTime dropOffTime;
     
     @ManyToOne
     private Partner partner;
@@ -74,7 +74,7 @@ public class Reservation implements Serializable {
         outlets = new ArrayList<>();
     }
 
-    public Reservation(String reservationNumber, List<Date> reservationDate, Time pickUpTime, Time dropOffTime) {
+    public Reservation(String reservationNumber, List<LocalDateTime> reservationDate, LocalTime pickUpTime, LocalTime dropOffTime) {
         this();
         
         this.reservationNumber = reservationNumber;
@@ -193,42 +193,42 @@ public class Reservation implements Serializable {
     /**
      * @return the reservationDate
      */
-    public List<Date> getReservationDate() {
+    public List<LocalDateTime> getReservationDate() {
         return reservationDate;
     }
 
     /**
      * @param reservationDate the reservationDate to set
      */
-    public void setReservationDate(List<Date> reservationDate) {
+    public void setReservationDate(List<LocalDateTime> reservationDate) {
         this.reservationDate = reservationDate;
     }
 
     /**
      * @return the pickUpTime
      */
-    public Time getPickUpTime() {
+    public LocalTime getPickUpTime() {
         return pickUpTime;
     }
 
     /**
      * @param pickUpTime the pickUpTime to set
      */
-    public void setPickUpTime(Time pickUpTime) {
+    public void setPickUpTime(LocalTime pickUpTime) {
         this.pickUpTime = pickUpTime;
     }
 
     /**
      * @return the dropOffTime
      */
-    public Time getDropOffTime() {
+    public LocalTime getDropOffTime() {
         return dropOffTime;
     }
 
     /**
      * @param dropOffTime the dropOffTime to set
      */
-    public void setDropOffTime(Time dropOffTime) {
+    public void setDropOffTime(LocalTime dropOffTime) {
         this.dropOffTime = dropOffTime;
     }
 

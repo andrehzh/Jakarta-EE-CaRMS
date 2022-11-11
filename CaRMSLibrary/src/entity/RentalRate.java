@@ -7,7 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -27,6 +26,20 @@ import javax.validation.constraints.Size;
 @Entity
 public class RentalRate implements Serializable {
 
+    /**
+     * @return the rentalRateName
+     */
+    public String getRentalRateName() {
+        return rentalRateName;
+    }
+
+    /**
+     * @param rentalRateName the rentalRateName to set
+     */
+    public void setRentalRateName(String rentalRateName) {
+        this.rentalRateName = rentalRateName;
+    }
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,27 +48,42 @@ public class RentalRate implements Serializable {
     @NotNull
     @Size(min = 1, max = 64)
     private String rentalRateName;
+    @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(min = 1, max = 64)
+    private String rentalRateType;
     @Column(nullable = false)
     @NotNull
     @Min(0)
     private BigDecimal rentalAmount;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    @Column(nullable = false)
-    @NotNull
-    private Date rentalDate;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Category category;
-    
+
     public RentalRate() {
     }
 
-    public RentalRate(String rentalRateName, BigDecimal rentalAmount, Date rentalDate) {
+    public RentalRate(String rentalRateName, String rentalRateType, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.rentalRateName = rentalRateName;
+        this.rentalRateType = rentalRateType;
         this.rentalAmount = rentalAmount;
-        this.rentalDate = rentalDate;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
     }
+
+    public RentalRate(String rentalRateName, String rentalRateType, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime, Category category) {
+        this.rentalRateName = rentalRateName;
+        this.rentalRateType = rentalRateType;
+        this.rentalAmount = rentalAmount;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.category = category;
+    }
+    
+    
 
     public Long getRentalRateId() {
         return rentalRateId;
@@ -63,6 +91,34 @@ public class RentalRate implements Serializable {
 
     public void setRentalRateId(Long rentalRateId) {
         this.rentalRateId = rentalRateId;
+    }
+
+    /**
+     * @return the startDateTime
+     */
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
+    }
+
+    /**
+     * @param startDateTime the startDateTime to set
+     */
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    /**
+     * @return the endDateTime
+     */
+    public LocalDateTime getEndDateTime() {
+        return endDateTime;
+    }
+
+    /**
+     * @param endDateTime the endDateTime to set
+     */
+    public void setEndDateTime(LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
     }
 
     /**
@@ -79,19 +135,18 @@ public class RentalRate implements Serializable {
         this.category = category;
     }
 
-
     /**
-     * @return the rentalRateName
+     * @return the rentalRateType
      */
-    public String getRentalRateName() {
-        return rentalRateName;
+    public String getRentalRateType() {
+        return rentalRateType;
     }
 
     /**
-     * @param rentalRateName the rentalRateName to set
+     * @param rentalRateType the rentalRateType to set
      */
-    public void setRentalRateName(String rentalRateName) {
-        this.rentalRateName = rentalRateName;
+    public void setRentalRateType(String rentalRateType) {
+        this.rentalRateType = rentalRateType;
     }
 
     /**
@@ -106,20 +161,6 @@ public class RentalRate implements Serializable {
      */
     public void setRentalAmount(BigDecimal rentalAmount) {
         this.rentalAmount = rentalAmount;
-    }
-
-    /**
-     * @return the rentalDate
-     */
-    public Date getRentalDate() {
-        return rentalDate;
-    }
-
-    /**
-     * @param rentalDate the rentalDate to set
-     */
-    public void setRentalDate(Date rentalDate) {
-        this.rentalDate = rentalDate;
     }
 
     @Override

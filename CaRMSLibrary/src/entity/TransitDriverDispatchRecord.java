@@ -6,9 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -34,10 +31,9 @@ public class TransitDriverDispatchRecord implements Serializable {
     @Column(nullable = false)
     @NotNull
     private boolean isCompleted;
-    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(nullable = false)
     @NotNull
-    private Date dispatchDate;
+    private LocalDateTime dispatchDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -49,7 +45,7 @@ public class TransitDriverDispatchRecord implements Serializable {
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(boolean isCompleted, Date dispatchDate) {
+    public TransitDriverDispatchRecord(boolean isCompleted, LocalDateTime dispatchDate) {
         this.isCompleted = isCompleted;
         this.dispatchDate = dispatchDate;
     }
@@ -132,14 +128,14 @@ public class TransitDriverDispatchRecord implements Serializable {
     /**
      * @return the dispatchDate
      */
-    public Date getDispatchDate() {
+    public LocalDateTime getDispatchDate() {
         return dispatchDate;
     }
 
     /**
      * @param dispatchDate the dispatchDate to set
      */
-    public void setDispatchDate(Date dispatchDate) {
+    public void setDispatchDate(LocalDateTime dispatchDate) {
         this.dispatchDate = dispatchDate;
     }
 

@@ -65,6 +65,14 @@ public class Employee implements Serializable {
         this.accessRight = accessRight;
     }
 
+    public Employee(String employeeName, String employeeEmail, String employeePassword, EmployeeAccessRightEnum accessRight, Outlet outlet) {
+        this.employeeName = employeeName;
+        this.employeeEmail = employeeEmail;
+        this.employeePassword = employeePassword;
+        this.accessRight = accessRight;
+        this.outlet = outlet;
+    }
+
     public Long getEmployeeId() {
         return employeeId;
     }

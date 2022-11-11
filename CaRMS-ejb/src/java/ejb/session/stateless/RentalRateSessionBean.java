@@ -6,7 +6,8 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -89,8 +90,8 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     //does it match the time stamp?
     @Override
-    public List<RentalRate> retrieveRentalRatesByDate(Date date) throws RentalRateNotFoundException {
-        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.date = :inDate");
+    public List<RentalRate> retrieveRentalRatesByDate(LocalDateTime date) throws RentalRateNotFoundException {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.date = :inDate");
         query.setParameter("inDate", date);
 
         try {
@@ -98,6 +99,19 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new RentalRateNotFoundException("Rental Rate date: " + date + " does not exist!");
         }
+    }
+    
+    @Override
+    public RentalRate retrieveRentalRateByRentalRateName(String rentalRateName) throws RentalRateNotFoundException {
+        try {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.rentalRateName = :inRentalRateName");
+        query.setParameter("inRentalRateName", rentalRateName);
+        
+        return (RentalRate) query.getSingleResult(); 
+        } catch (PersistenceException ex) {
+            throw new RentalRateNotFoundException();
+        }
+        
     }
 
     @Override
@@ -109,9 +123,11 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                 RentalRate rentalRateToUpdate = retrieveRentalRateByRentalRateId(rentalRate.getRentalRateId());
 
                 if (rentalRateToUpdate.getRentalRateName().equals(rentalRate.getRentalRateName())) {
+                    rentalRateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
                     rentalRateToUpdate.setRentalAmount(rentalRate.getRentalAmount());
                     rentalRateToUpdate.setCategory(rentalRate.getCategory());
-                    rentalRateToUpdate.setRentalDate(rentalRate.getRentalDate());
+                    rentalRateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
+                    rentalRateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
                     //  can update everything about a rental rate except name?
                 } else {
                     throw new UpdateRentalRateException("UpdateRentalRateException");

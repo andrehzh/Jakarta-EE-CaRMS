@@ -31,5 +31,7 @@ public interface CarSessionBeanLocal {
     public void updateCar(Car car) throws CarNotFoundException, InputDataValidationException, UpdateCarException;
 
     public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException;
+
+    public Car retrieveCarByCarPlate(String carPlate) throws CarNotFoundException;
     
 }

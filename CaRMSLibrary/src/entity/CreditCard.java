@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -40,10 +39,9 @@ public class CreditCard implements Serializable {
     @Column(nullable = false)
     @NotNull
     private int creditVerificationValue;
-    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(nullable = false)
     @NotNull
-    private Date expiryDate;
+    private LocalDate expiryDate;
 
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -52,7 +50,7 @@ public class CreditCard implements Serializable {
     public CreditCard() {
     }
 
-    public CreditCard(String nameOnCard, String cardNumber, int creditVerificationValue, Date expiryDate) {
+    public CreditCard(String nameOnCard, String cardNumber, int creditVerificationValue, LocalDate expiryDate) {
         this.nameOnCard = nameOnCard;
         this.cardNumber = cardNumber;
         this.creditVerificationValue = creditVerificationValue;
@@ -118,14 +116,14 @@ public class CreditCard implements Serializable {
     /**
      * @return the expiryDate
      */
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
     /**
      * @param expiryDate the expiryDate to set
      */
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 

@@ -30,4 +30,6 @@ public interface OutletSessionBeanLocal {
 
     public void deleteOutlet(Long outletId) throws OutletNotFoundException;
 
+    public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException;
+
 }

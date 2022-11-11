@@ -81,6 +81,19 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
+    public CarModel retrieveCarModelByCarModelName(String carModelName) throws CarModelNotFoundException {
+        try {
+            Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.outletName = :inOutletName");
+            query.setParameter("inOutletName", carModelName);
+
+            return (CarModel) query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw new CarModelNotFoundException();
+        }
+
+    }
+
+    @Override
     public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException, UpdateCarModelException {
         if (carModel != null && carModel.getCarModelId() != null) {
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
@@ -104,10 +117,10 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @Override
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException, DeleteCarModelException {
         CarModel carModelToRemove = retrieveCarModelById(carModelId);
-        if (carModelToRemove.getCars().isEmpty()) {
+        try {
             em.remove(carModelToRemove);
-        } else {
-            throw new DeleteCarModelException("Car Model " + carModelId.toString() + " is associated with existing car(s) and cannot be deleted!");
+        } catch (PersistenceException ex) {
+            throw new DeleteCarModelException("Car Model " + carModelId.toString() + " cannot be deleted!");
         }
     }
 

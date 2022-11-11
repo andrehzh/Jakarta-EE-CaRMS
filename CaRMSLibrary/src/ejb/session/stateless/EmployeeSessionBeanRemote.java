@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Outlet;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.DeleteEmployeeException;
@@ -32,4 +33,5 @@ public interface EmployeeSessionBeanRemote {
 
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException;
 
+    public Employee retrieveEmployeeByEmployeeEmail(String employeeEmail) throws EmployeeNotFoundException;
 }

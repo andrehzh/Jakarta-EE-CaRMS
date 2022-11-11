@@ -85,6 +85,19 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
+    public Car retrieveCarByCarPlate(String carPlate) throws CarNotFoundException {
+        try {
+            Query query = em.createQuery("SELECT c FROM Car c WHERE c.carPlate = :inCarPlate");
+            query.setParameter("inCarPlate", carPlate);
+
+            return (Car) query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw new CarNotFoundException();
+        }
+
+    }
+
+    @Override
     public void updateCar(Car car) throws CarNotFoundException, InputDataValidationException, UpdateCarException {
         if (car != null && car.getCarId() != null) {
             Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);

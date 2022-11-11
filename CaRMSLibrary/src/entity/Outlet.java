@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -31,12 +31,12 @@ public class Outlet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, unique = true, length = 64)
     @NotNull
     @Size(min = 1, max = 64)
     private String outletName;
-    private Time openingTime;
-    private Time closingTime;
+    private LocalTime openingTime;
+    private LocalTime closingTime;
     
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
@@ -56,7 +56,7 @@ public class Outlet implements Serializable {
         cars = new ArrayList<>();
     }
 
-    public Outlet(String outletName, Time openingTime, Time closingTime) {
+    public Outlet(String outletName, LocalTime openingTime, LocalTime closingTime) {
         this();
         
         this.outletName = outletName;
@@ -170,28 +170,28 @@ public class Outlet implements Serializable {
     /**
      * @return the openingTime
      */
-    public Time getOpeningTime() {
+    public LocalTime getOpeningTime() {
         return openingTime;
     }
 
     /**
      * @param openingTime the openingTime to set
      */
-    public void setOpeningTime(Time openingTime) {
+    public void setOpeningTime(LocalTime openingTime) {
         this.openingTime = openingTime;
     }
 
     /**
      * @return the closingTime
      */
-    public Time getClosingTime() {
+    public LocalTime getClosingTime() {
         return closingTime;
     }
 
     /**
      * @param closingTime the closingTime to set
      */
-    public void setClosingTime(Time closingTime) {
+    public void setClosingTime(LocalTime closingTime) {
         this.closingTime = closingTime;
     }
 

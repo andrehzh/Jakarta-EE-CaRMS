@@ -32,4 +32,6 @@ public interface CategorySessionBeanLocal {
 
     public void deleteCategory(Long categoryId) throws CategoryNotFoundException, DeleteCategoryException;
 
+    public Category retrieveCategoryByCategoryName(String categoryName) throws CategoryNotFoundException;
+
 }

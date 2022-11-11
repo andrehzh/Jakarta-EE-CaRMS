@@ -8,13 +8,12 @@ package entity;
 import util.enumeration.TransactionStatusEnum;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -33,10 +32,9 @@ public class ReservationTransaction implements Serializable {
     @NotNull
     @Min(0)
     private BigDecimal transactionAmount;
-    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(nullable = false)
     @NotNull
-    private Date transactionDate;
+    private LocalDateTime transactionDate;
     @Column(nullable = false)
     @NotNull
     private TransactionStatusEnum transactionStaus;
@@ -44,7 +42,7 @@ public class ReservationTransaction implements Serializable {
     public ReservationTransaction() {
     }
 
-    public ReservationTransaction(BigDecimal transactionAmount, Date transactionDate, TransactionStatusEnum transactionStaus) {
+    public ReservationTransaction(BigDecimal transactionAmount, LocalDateTime transactionDate, TransactionStatusEnum transactionStaus) {
         this.transactionAmount = transactionAmount;
         this.transactionDate = transactionDate;
         this.transactionStaus = transactionStaus;
@@ -75,14 +73,14 @@ public class ReservationTransaction implements Serializable {
     /**
      * @return the transactionDate
      */
-    public Date getTransactionDate() {
+    public LocalDateTime getTransactionDate() {
         return transactionDate;
     }
 
     /**
      * @param transactionDate the transactionDate to set
      */
-    public void setTransactionDate(Date transactionDate) {
+    public void setTransactionDate(LocalDateTime transactionDate) {
         this.transactionDate = transactionDate;
     }
 

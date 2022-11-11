@@ -34,7 +34,7 @@ public class CarModel implements Serializable {
     @NotNull
     @Size(min = 1, max = 64)
     private String carModelBrand;
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, unique = true, length = 64)
     @NotNull
     @Size(min = 1, max = 64)
     private String carModelName;
@@ -43,18 +43,23 @@ public class CarModel implements Serializable {
     @JoinColumn(nullable = false)
     private Category category;
     
-    @OneToMany(mappedBy = "carModel")
-    private List<Car> cars;
+//theres no need to track the num of cars
+    
+//    @OneToMany(mappedBy = "carModel")
+//    private List<Car> cars;
 
     public CarModel() {
-        cars = new ArrayList<>();
     }
 
     public CarModel(String carModelBrand, String carModelName) {
-        this();
-        
         this.carModelBrand = carModelBrand;
         this.carModelName = carModelName;
+    }
+
+    public CarModel(String carModelBrand, String carModelName, Category category) {
+        this.carModelBrand = carModelBrand;
+        this.carModelName = carModelName;
+        this.category = category;
     }
 
     public Long getCarModelId() {
@@ -77,20 +82,6 @@ public class CarModel implements Serializable {
      */
     public void setCategory(Category category) {
         this.category = category;
-    }
-
-    /**
-     * @return the cars
-     */
-    public List<Car> getCars() {
-        return cars;
-    }
-
-    /**
-     * @param cars the cars to set
-     */
-    public void setCars(List<Car> cars) {
-        this.cars = cars;
     }
 
     @Override

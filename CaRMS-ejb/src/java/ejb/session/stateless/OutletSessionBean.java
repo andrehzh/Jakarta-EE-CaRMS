@@ -78,6 +78,25 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
 
         return query.getResultList();
     }
+    
+    /**
+     *
+     * @param outletName
+     * @return
+     * @throws OutletNotFoundException
+     */
+    @Override
+    public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException {
+        try {
+        Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.outletName = :inOutletName");
+        query.setParameter("inOutletName", outletName);
+        
+        return (Outlet) query.getSingleResult(); 
+        } catch (PersistenceException ex) {
+            throw new OutletNotFoundException();
+        }
+        
+    }
 
     @Override
     public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException, UpdateOutletException {

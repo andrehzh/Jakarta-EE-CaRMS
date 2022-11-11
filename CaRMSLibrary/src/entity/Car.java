@@ -7,6 +7,7 @@ package entity;
 
 import util.enumeration.CarStatusEnum;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -57,13 +58,28 @@ public class Car implements Serializable {
     
 
     public Car() {
+        reservations = new ArrayList<>();
     }
 
     public Car(String carPlateNumber, String carColor, CarStatusEnum carStatus) {
+        this();
+        
         this.carPlateNumber = carPlateNumber;
         this.carColor = carColor;
         this.carStatus = carStatus;
     }
+
+    public Car(String carPlateNumber, CarStatusEnum carStatus, CarModel carModel, Outlet outlet) {
+        this();
+        
+        this.carPlateNumber = carPlateNumber;
+        this.carStatus = carStatus;
+        this.carModel = carModel;
+        this.outlet = outlet;
+        this.carColor = "Orangey Black";
+    }
+    
+    
 
     public Long getCarId() {
         return carId;
