@@ -8,6 +8,7 @@ package carmsmanagementclient;
 import entity.Employee;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
 import java.util.Scanner;
 import util.exception.InvalidLoginCredentialException;
 
@@ -18,17 +19,18 @@ import util.exception.InvalidLoginCredentialException;
 public class MainApp {
 
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
-
     private OutletSessionBeanRemote outletSessionBeanRemote;
-    
     private Employee currentEmployee;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private SalesManagementModule salesManagementModule;
 
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
     }
 
     public void runApp() {
@@ -51,9 +53,8 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login successful!\n");
 
-//                        cashierOperationModule = new CashierOperationModule(productEntitySessionBeanRemote, saleTransactionEntitySessionBeanRemote, checkoutBeanRemote, emailSessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory, currentStaffEntity);
-//                        systemAdministrationModule = new SystemAdministrationModule(staffEntitySessionBeanRemote, productEntitySessionBeanRemote, currentStaffEntity);
-//                        menuMain();
+                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, currentEmployee);
+                        menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
@@ -85,6 +86,47 @@ public class MainApp {
             currentEmployee = employeeSessionBeanRemote.employeeLogin(email, password);
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
+        }
+    }
+
+    private void menuMain() {
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+
+        while (true) {
+            System.out.println("*** CaRMS Management Client ***\n");
+            System.out.println("You are logged in as " + currentEmployee.getEmployeeName() + " with " + currentEmployee.getAccessRight().toString() + " rights.\n");
+            System.out.println("1: Sales Management");
+            System.out.println("2: Operations Management");
+            System.out.println("3: Customer Service");
+            System.out.println("4: Logout\n");
+            response = 0;
+
+            while (response < 1 || response > 4) {
+                System.out.print("> ");
+
+                response = scanner.nextInt();
+
+                if (response == 1) {
+//                    cashierOperationModule.menuCashierOperation();
+                } else if (response == 2) {
+//                    try {
+////                        systemAdministrationModule.menuSystemAdministration();
+//                    } catch (InvalidAccessRightException ex) {
+//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+//                    }
+                } else if (response == 3) {
+//                    
+                } else if (response == 4) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+
+            if (response == 4) {
+                break;
+            }
         }
     }
 }

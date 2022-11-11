@@ -25,12 +25,12 @@ public interface OutletSessionBeanRemote {
 
     public Outlet retrieveOutletById(Long id) throws OutletNotFoundException;
 
-    public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException;
-
     public List<Outlet> retrieveAllOutlets();
 
     public void updateOutlet(Outlet outlet) throws OutletNotFoundException, InputDataValidationException, UpdateOutletException;
 
     public void deleteOutlet(Long outletId) throws OutletNotFoundException;
+
+    public Outlet retrieveOutletByOutletName(String outletName) throws OutletNotFoundException;
 
 }
