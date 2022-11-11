@@ -28,7 +28,7 @@ public class Partner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long partnerId;
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, unique = true, length = 64)
     @NotNull
     @Size(min = 1, max = 64)
     private String partnerName;
