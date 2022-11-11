@@ -78,28 +78,6 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         return query.getResultList();
     }
 
-//    @Override
-//    public void updateCarModel(CarModel carModel) throws CarModelNotFoundExeception, UpdateCarModelException, InputDataValidationException {
-//        if (carModel != null && carModel.getCarModelId() != null) {
-//            Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
-//
-//            if (constraintViolations.isEmpty()) {
-//                CarModel carModelToUpdate = retrieveCarModelById(carModel.getCarModelId());
-//
-//                if (carModelToUpdate.getRentalRateName().equals(rentalRate.getRentalRateName())) {
-//                    carModelToUpdate.setRentalAmount(rentalRate.getRentalAmount());
-//                    carModelToUpdate.setCategory(rentalRate.getCategory());
-//                    carModelToUpdate.setRentalDate(rentalRate.getRentalDate());
-//                } else {
-//                    throw new UpdateRentalRateException("UpdateRentalRateException");
-//                }
-//            } else {
-//                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
-//            }
-//        } else {
-//            throw new RentalRateNotFoundException("RentalRateNotFoundException");
-//        }
-//    }
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarModel>> constraintViolations) {
         String msg = "Input data validation error!:";
 
