@@ -40,7 +40,10 @@ public class TransitDriverDispatchRecord implements Serializable {
     private Employee employee;
 
     @OneToOne
-    private Outlet outlets;
+    private Outlet pickUpOutlet;
+    
+    @OneToOne
+    private Outlet dropOffOutlet;
 
     public TransitDriverDispatchRecord() {
     }
@@ -49,6 +52,15 @@ public class TransitDriverDispatchRecord implements Serializable {
         this.isCompleted = isCompleted;
         this.dispatchDate = dispatchDate;
     }
+
+    public TransitDriverDispatchRecord(LocalDateTime dispatchDate, Outlet pickUpOutlet, Outlet dropOffOutlet) {
+        this.isCompleted=false;
+        this.dispatchDate = dispatchDate;
+        this.pickUpOutlet = pickUpOutlet;
+        this.dropOffOutlet = dropOffOutlet;
+    }
+
+
 
     public Long getTransitDriverDispatchRecordId() {
         return transitDriverDispatchRecordId;
@@ -59,17 +71,31 @@ public class TransitDriverDispatchRecord implements Serializable {
     }
 
     /**
-     * @return the outlets
+     * @return the pickUpOutlet
      */
-    public Outlet getOutlets() {
-        return outlets;
+    public Outlet getPickUpOutlet() {
+        return pickUpOutlet;
     }
 
     /**
-     * @param outlets the outlets to set
+     * @param pickUpOutlet the pickUpOutlet to set
      */
-    public void setOutlets(Outlet outlets) {
-        this.outlets = outlets;
+    public void setPickUpOutlet(Outlet pickUpOutlet) {
+        this.pickUpOutlet = pickUpOutlet;
+    }
+
+    /**
+     * @return the dropOffOutlet
+     */
+    public Outlet getDropOffOutlet() {
+        return dropOffOutlet;
+    }
+
+    /**
+     * @param dropOffOutlet the dropOffOutlet to set
+     */
+    public void setDropOffOutlet(Outlet dropOffOutlet) {
+        this.dropOffOutlet = dropOffOutlet;
     }
 
     /**

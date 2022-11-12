@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.Reservation;
+import entity.TransitDriverDispatchRecord;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -20,7 +21,11 @@ import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import util.enumeration.CarStatusEnum;
+import util.exception.CarNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.NoAvailableCarException;
+import util.exception.ReservationNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -49,7 +54,6 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
         //afterwards it changes/can change..
         //because idk where the car is gonna be in the future??
         //what am i accounting for by reshuffling??
-        //possible cancels??
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
         LocalDateTime currentDateTime = LocalDateTime.now();
         System.out.println("********** EjbTimerSessionBean.allocateCarsToCurrentDayReservations(): Timeout at " + timeStamp);
@@ -87,76 +91,103 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
                     .mapToObj(i -> reservation.getPickUpDateTime().plusDays(i))
                     .collect(Collectors.toList());
 
-            for (Car car : availableCars) {
-                //need to iterate thru existing reservations
-                //check if car is even the correct category
-                if (reservation.getCategory() == car.getCarModel().getCategory() || reservation.getCategory() == null) {
-                    //check if car is the correct Model
-                    if (reservation.getCarModel() == car.getCarModel() || reservation.getCarModel() == null) {
+            try {
+                for (Car car : availableCars) {
+                    //need to iterate thru existing reservations
+                    //check if car is even the correct category
+                    if (reservation.getCategory() == car.getCarModel().getCategory() || reservation.getCategory() == null) {
+                        //check if car is the correct Model
+                        if (reservation.getCarModel() == car.getCarModel() || reservation.getCarModel() == null) {
 
-                        List<Reservation> existingFutureReservations = car.getReservations();
+                            List<Reservation> existingFutureReservations = car.getReservations();
 
-                        boolean noConflict = true;
-                        boolean noMoreCarsChosen = false;
+                            boolean noConflict = true;
+                            boolean noMoreDaysToCheck = false;
 
-                        while (noConflict == true && noMoreCarsChosen == false) {
-                            //check the most broad range for conflict +2 -2 hrs
-                            for (LocalDateTime day : allDays) {
+                            while (noConflict == true && noMoreDaysToCheck == false) {
+                                //check the most broad range for conflict +2 -2 hrs
+                                for (LocalDateTime day : allDays) {
 
-                                for (Reservation futureReservation : existingFutureReservations) {
-                                    //check that is just nice that means to update best car it must be at the same outlet for pick up 
-                                    //focus on pick up onlyyy
+                                    for (Reservation futureReservation : existingFutureReservations) {
+                                        //check that is just nice that means to update best car it must be at the same outlet for pick up 
+                                        //focus on pick up onlyyy
 
-                                    LocalDateTime pickUpDateTimeWithDispatch = reservation.getPickUpDateTime().plusHours(-2);
-                                    LocalDateTime dropOffDateTimeWithDispatch = reservation.getDropOffDateTime().plusHours(2);
+                                        LocalDateTime pickUpDateTimeWithDispatch = reservation.getPickUpDateTime().plusHours(-2);
+                                        LocalDateTime dropOffDateTimeWithDispatch = reservation.getDropOffDateTime().plusHours(2);
 
-                                    //i reached the last day with no conflict at all on the dates
-                                    if (day.toLocalDate().equals(reservation.getDropOffDateTime().toLocalDate())) {
-                                        //check if at the same outlet and if a dispatch is still needed
-                                        if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
-                                            bestCarId = car.getCarId();
-                                            needDispatch = false;
-                                            //breaks the loop
-                                            noMoreCarsChosen = true;
-                                        } else if (needDispatch && bestCarId == 0) {
-                                            bestCarId = car.getCarId();
+                                        //i reached the last day with no conflict at all on the dates
+                                        if (day.toLocalDate().equals(reservation.getDropOffDateTime().toLocalDate())) {
+                                            //check if at the same outlet and if a dispatch is still needed
+                                            if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
+                                                bestCarId = car.getCarId();
+                                                needDispatch = false;
+                                                //breaks the loop
+                                                noMoreDaysToCheck = true;
+                                            } else if (needDispatch && bestCarId == 0) {
+                                                bestCarId = car.getCarId();
+                                            }
+                                            //account for edge cases
+                                            //either or of the days equal to each other but must be first or last ONLY
+                                            //first day is same but have enough time to dispatch
+                                        } else if (day.toLocalDate().equals(reservation.getPickUpDateTime().toLocalDate())
+                                                && day.toLocalDate().equals(futureReservation.getDropOffDateTime().toLocalDate())
+                                                && day.isAfter(futureReservation.getDropOffDateTime())) {
+                                            //need to account for first day looks good but what is subsequent days cmi.
+                                            if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
+                                                //if im only checking the first day i can chill first no need to do anything so j update the dispatch status
+                                                needDispatch = false;
+                                                //supposed to still go thru all the days
+                                            } else if (futureReservation.getDropOffDateTime().isBefore(pickUpDateTimeWithDispatch) || futureReservation.getDropOffDateTime().equals(pickUpDateTimeWithDispatch)) {
+                                                needDispatch = true;
+                                            }
+                                        } else if (day.toLocalDate().equals(reservation.getDropOffDateTime().toLocalDate())
+                                                && day.toLocalDate().equals(futureReservation.getPickUpDateTime().toLocalDate())
+                                                && day.isBefore(futureReservation.getPickUpDateTime())) {
+                                            //check until last day then got issue.... but possible cause same outlet or enough time
+                                            if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
+                                                bestCarId = car.getCarId();
+                                                needDispatch = false;
+                                                //breaks the loop cause last day to check
+                                                noMoreDaysToCheck = true;
+                                            } else if ((futureReservation.getPickUpDateTime().isAfter(dropOffDateTimeWithDispatch) || futureReservation.getPickUpDateTime().equals(dropOffDateTimeWithDispatch))
+                                                    && bestCarId == 0) {
+                                                bestCarId = car.getCarId();
+                                                noMoreDaysToCheck = true;
+                                            }
+                                        } else if (day.toLocalDate().equals(futureReservation.getPickUpDateTime().toLocalDate()) || day.toLocalDate().equals(futureReservation.getDropOffDateTime().toLocalDate())) {
+                                            noConflict = false;
                                         }
-                                        //account for edge cases
-                                        //either or of the days equal to each other but must be first or last ONLY
-                                        //first day is same but have enough time to dispatch
-                                    } else if (reservation.getPickUpDateTime().toLocalDate().equals(futureReservation.getDropOffDateTime().toLocalDate())
-                                            && reservation.getPickUpDateTime().isAfter(futureReservation.getDropOffDateTime())) {
-                                        //need to account for first day looks good but what is subsequent days cmi.
-                                        if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
-                                            //if im only checking the first day i can chill first no need to do anything so j update the dispatch status
-                                            needDispatch = false;
-                                            //supposed to still go thru all the days
-                                        } else if (futureReservation.getDropOffDateTime().isBefore(pickUpDateTimeWithDispatch) || futureReservation.getDropOffDateTime().equals(pickUpDateTimeWithDispatch)) {
-                                            needDispatch = true;
-                                        }
-                                    } else if (reservation.getDropOffDateTime().toLocalDate().equals(futureReservation.getPickUpDateTime().toLocalDate())
-                                            && reservation.getDropOffDateTime().isBefore(futureReservation.getPickUpDateTime())) {
-                                        //check until last day then got issue.... but possible cause same outlet or enough time
-                                        if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
-                                            bestCarId = car.getCarId();
-                                            needDispatch = false;
-                                            //breaks the loop cause last day to check
-                                            noMoreCarsChosen = true;
-                                        } else if ((futureReservation.getPickUpDateTime().isAfter(dropOffDateTimeWithDispatch) || futureReservation.getPickUpDateTime().equals(dropOffDateTimeWithDispatch))
-                                                && bestCarId == 0) {
-                                            bestCarId = car.getCarId();
-                                            noMoreCarsChosen = true;
-                                        }
-                                    } else {
-                                        noConflict = false;
                                     }
                                 }
-
                             }
                         }
                     }
+                    if (availableCars.get(availableCars.size()-1).equals(car) && bestCarId == 0) {
+                        throw new NoAvailableCarException();
+                    }
                 }
+            } catch (NoAvailableCarException ex) {
+                System.out.println("Something is wrong with EJB Timer Session Bean Java 1");
             }
+            try {
+                //assign reservation to car vice versa
+                reservationSessionBeanLocal.retrieveReservationByReservationId(reservation.getReservationId()).setCar(carSessionBeanLocal.retrieveCarById(bestCarId));
+                carSessionBeanLocal.retrieveCarById(bestCarId).getReservations().add(reservationSessionBeanLocal.retrieveReservationByReservationId(reservation.getReservationId()));
+                //send the dispatch
+                if(needDispatch) {
+                    //pickup timing
+                    LocalDateTime pickUpDateTimeWithDispatch = reservation.getPickUpDateTime().minusHours(2);
+                    transitDriverDispatchRecordSessionBeanLocal.createNewTransitDriverDispatchRecord(new TransitDriverDispatchRecord(pickUpDateTimeWithDispatch, carSessionBeanLocal.retrieveCarById(bestCarId).getOutlet(), reservation.getPickUpOutlet()));
+                } else {
+                    System.out.println("No Dispatch Needed.");
+                }
+            } catch (ReservationNotFoundException | CarNotFoundException | UnknownPersistenceException | InputDataValidationException ex) {
+                System.out.println("Something is wrong with EJB Timer Session Bean Java 2");
+            }
+
         }
     }
+    
+    
+    //need something to constantly update the status of cars everyday.
 }
