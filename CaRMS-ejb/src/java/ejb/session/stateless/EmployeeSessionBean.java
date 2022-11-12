@@ -83,7 +83,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     @Override
     public Employee retrieveEmployeeByEmployeeEmail(String email) throws EmployeeNotFoundException {
         try {
-            Query query = em.createQuery("SELECT s FROM Employee s WHERE s.email = :inEmail");
+            Query query = em.createQuery("SELECT s FROM Employee s WHERE s.employeeEmail = :inEmail");
             query.setParameter("inEmail", email);
             return (Employee) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {

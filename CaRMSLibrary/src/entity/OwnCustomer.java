@@ -58,6 +58,20 @@ public class OwnCustomer extends Customer {
     }
 
     /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
+    /**
      * @return the passportNumber
      */
     public String getPassportNumber() {

@@ -33,7 +33,7 @@ public class Partner implements Serializable {
     @Size(min = 1, max = 64)
     private String partnerName;
     
-    @OneToMany(mappedBy = "partner")
+    @OneToMany
     private List<Customer> customers;
     
     @OneToMany(mappedBy = "partner")

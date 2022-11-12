@@ -37,10 +37,10 @@ public class Category implements Serializable {
     @NotNull
     private String categoryDesc;
     
-    @OneToMany(mappedBy = "category")
+    @OneToMany
     private List<RentalRate> rentalRates;
     
-    @OneToMany(mappedBy = "category")
+    @OneToMany
     private List<CarModel> carModels;
 
     public Category() {

@@ -55,41 +55,42 @@ public class SalesManagementModule {
     }
 
     public void menuSalesManagement() throws InvalidAccessRightException {
-        if (currentEmployee.getAccessRight() != EmployeeAccessRightEnum.SALES_MANAGER | currentEmployee.getAccessRight() != EmployeeAccessRightEnum.SYSTEM_ADMINISTRATOR) {
-            throw new InvalidAccessRightException("You don't have rights to access the Sales Management module.");
-        }
+        if (currentEmployee.getAccessRight() == EmployeeAccessRightEnum.SALES_MANAGER || currentEmployee.getAccessRight() == EmployeeAccessRightEnum.SYSTEM_ADMINISTRATOR) {
 
-        Scanner scanner = new Scanner(System.in);
-        Integer response = 0;
-        while (true) {
-            System.out.println("*** CaRMS Management Client :: Sales Management ***\n");
-            System.out.println("1: Create New Rental Rate");
-            System.out.println("2: View All Rental Rates");
-            System.out.println("3: View Rental Rate Details");
-            System.out.println("4: Back\n");
-            response = 0;
+            Scanner scanner = new Scanner(System.in);
+            Integer response = 0;
+            while (true) {
+                System.out.println("*** CaRMS Management Client :: Sales Management ***\n");
+                System.out.println("1: Create New Rental Rate");
+                System.out.println("2: View All Rental Rates");
+                System.out.println("3: View Rental Rate Details");
+                System.out.println("4: Back\n");
+                response = 0;
 
-            while (response < 1 || response > 4) {
-                System.out.print("> ");
+                while (response < 1 || response > 4) {
+                    System.out.print("> ");
 
-                response = scanner.nextInt();
+                    response = scanner.nextInt();
 
-                if (response == 1) {
-                    doCreateNewRentalRate();
-                } else if (response == 2) {
-                    doViewAllRentalRates();
-                } else if (response == 3) {
-                    doViewRentalRateDetails();
-                } else if (response == 4) {
+                    if (response == 1) {
+                        doCreateNewRentalRate();
+                    } else if (response == 2) {
+                        doViewAllRentalRates();
+                    } else if (response == 3) {
+                        doViewRentalRateDetails();
+                    } else if (response == 4) {
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
+
+                if (response == 4) {
                     break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
                 }
             }
-
-            if (response == 4) {
-                break;
-            }
+        } else {
+            throw new InvalidAccessRightException("You don't have rights to access the Sales Management module.");
         }
     }
 
@@ -101,6 +102,12 @@ public class SalesManagementModule {
         newRentalRate.setRentalRateName(scanner.nextLine().trim());
         System.out.print("Enter Rental Rate Type> ");
         newRentalRate.setRentalRateType(scanner.nextLine().trim());
+
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        int hour = 0;
+        int minute = 0;
 
         System.out.print("Enter Car Category> ");
         String categoryName = scanner.nextLine().trim();
@@ -114,15 +121,35 @@ public class SalesManagementModule {
         System.out.print("Enter Rate per Day> $");
         newRentalRate.setRentalAmount(scanner.nextBigDecimal());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
+        System.out.println("*** Please enter the Validity Start Details Accordingly ***");
+        System.out.print("Enter Year(2022)> ");
+        year = scanner.nextInt();
+        System.out.print("Enter Month(12)> ");
+        month = scanner.nextInt();
+        System.out.print("Enter Day(15)> ");
+        day = scanner.nextInt();
+        System.out.print("Enter Hour(22)> ");
+        hour = scanner.nextInt();
+        System.out.print("Enter Minute(15)> ");
+        minute = scanner.nextInt();
 
-        System.out.print("Enter Validity Start Date (DDMMYY)> ");
-        String dateString = scanner.nextLine().trim();
-        newRentalRate.setStartDateTime(LocalDateTime.parse(dateString, formatter));
+        newRentalRate.setStartDateTime(LocalDateTime.of(year, month, day, hour, minute));
+        System.out.println("The rental rate START date is: " + newRentalRate.getStartDateTime().toString() + "\n");
 
-        System.out.print("Enter Validity End Date (DDMMYY)> ");
-        dateString = scanner.nextLine().trim();
-        newRentalRate.setEndDateTime(LocalDateTime.parse(dateString, formatter));
+        System.out.println("*** Please enter the Validity End Details Accordingly ***");
+        System.out.print("Enter Year(2022)> ");
+        year = scanner.nextInt();
+        System.out.print("Enter Month(12)> ");
+        month = scanner.nextInt();
+        System.out.print("Enter Day(15)> ");
+        day = scanner.nextInt();
+        System.out.print("Enter Hour(22)> ");
+        hour = scanner.nextInt();
+        System.out.print("Enter Minute(15)> ");
+        minute = scanner.nextInt();
+
+        newRentalRate.setEndDateTime(LocalDateTime.of(year, month, day, hour, minute));
+        System.out.println("The rental rate END date is: " + newRentalRate.getStartDateTime().toString() + "\n");
 
         Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
 

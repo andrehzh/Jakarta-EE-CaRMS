@@ -33,7 +33,7 @@ public class MainApp {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
-    
+
     public MainApp() {
     }
 
@@ -45,7 +45,7 @@ public class MainApp {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
-        
+
     }
 
     public void runApp() {
@@ -53,7 +53,7 @@ public class MainApp {
         Integer response = 0;
 
         while (true) {
-            System.out.println("*** Welcome to Point-of-Sale (POS) System (v4.3) ***\n");
+            System.out.println("*** Welcome to CaRMS ***\n");
             System.out.println("1: Employee Login");
             System.out.println("2: Exit\n");
             response = 0;
@@ -74,7 +74,7 @@ public class MainApp {
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
-                } else if (response == 2) {
+                }  else if (response == 2) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
@@ -135,10 +135,10 @@ public class MainApp {
                     } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
-//                } else if (response == 3) {
-////                    
-//                } else if (response == 4) {
-//                    break;
+                } else if (response == 3) {
+                    System.out.println("doCustomerService");
+                } else if (response == 4) {
+                    doLogout();
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
@@ -147,6 +147,15 @@ public class MainApp {
             if (response == 4) {
                 break;
             }
+        }
+    }
+        
+    private void doLogout() {
+        if (currentEmployee != null) {
+            currentEmployee = null;
+            System.out.println("*** Logged out successfully! ***\n");
+        } else {
+            System.out.println("*** Please Log In First! ***\n");
         }
     }
 }

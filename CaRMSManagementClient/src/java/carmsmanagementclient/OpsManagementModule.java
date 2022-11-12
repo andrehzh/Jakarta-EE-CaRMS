@@ -15,8 +15,6 @@ import entity.Category;
 import entity.Employee;
 import entity.CarModel;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -71,57 +69,66 @@ public class OpsManagementModule {
     }
 
     public void menuOpsManagement() throws InvalidAccessRightException {
-        if (currentEmployee.getAccessRight() != EmployeeAccessRightEnum.OPS_MANAGER | currentEmployee.getAccessRight() != EmployeeAccessRightEnum.SYSTEM_ADMINISTRATOR) {
-            throw new InvalidAccessRightException("You don't have rights to access the Operations Management module.");
-        }
+        if (currentEmployee.getAccessRight() == EmployeeAccessRightEnum.OPS_MANAGER || currentEmployee.getAccessRight() == EmployeeAccessRightEnum.SYSTEM_ADMINISTRATOR) {
 
-        Scanner scanner = new Scanner(System.in);
-        Integer response = 0;
-        while (true) {
-            System.out.println("*** CaRMS Management Client :: Operations Management ***\n");
-            System.out.println("1: Create New Car Model");
-            System.out.println("2: View All Car Models");
-            System.out.println("3: Update Car Model");
-            System.out.println("4: Delete Car Model");
-            System.out.println("5: Create New Car");
-            System.out.println("6: View All Cars");
-            System.out.println("7: View Car Details");
-            System.out.println("8: View Transit Driver Dispatch Records for Current Day Reservations");
-            System.out.println("9: Assign Transit Driver");
-            System.out.println("10: Update Transit As Completed");
-            System.out.println("11: Back\n");
-            response = 0;
+            Scanner scanner = new Scanner(System.in);
+            Integer response = 0;
+            while (true) {
+                System.out.println("*** CaRMS Management Client :: Operations Management ***\n");
+                System.out.println("1: Create New Car Model");
+                System.out.println("2: View All Car Models");
+                System.out.println("3: Update Car Model");
+                System.out.println("--------------------------");
+                System.out.println("4: Delete Car Model");
+                System.out.println("5: Create New Car");
+                System.out.println("6: View All Cars");
+                System.out.println("--------------------------");
+                System.out.println("7: View Car Details");
+                System.out.println("8: View Transit Driver Dispatch Records for Current Day Reservations");
+                System.out.println("9: Assign Transit Driver");
+                System.out.println("--------------------------");
+                System.out.println("10: Update Transit As Completed");
+                System.out.println("11: Back\n");
+                response = 0;
 
-            while (response < 1 || response > 11) {
-                System.out.print("> ");
+                while (response < 1 || response > 11) {
+                    System.out.print("> ");
 
-                response = scanner.nextInt();
+                    response = scanner.nextInt();
 
-                if (response == 1) {
-                    doCreateNewCarModel();
-                } else if (response == 2) {
-                    doViewAllCarModels();
-                } else if (response == 3) {
-                    doUpdateCarModel();
-                } else if (response == 4) {
-                    doDeleteCarModel();
-                } else if (response == 5) {
-                } else if (response == 6) {
-                } else if (response == 7) {
-                } else if (response == 8) {
-                } else if (response == 9) {
-                } else if (response == 10) {
+                    if (response == 1) {
+                        doCreateNewCarModel();
+                    } else if (response == 2) {
+                        doViewAllCarModels();
+                    } else if (response == 3) {
+                        doUpdateCarModel();
+                    } else if (response == 4) {
+                        doDeleteCarModel();
+                    } else if (response == 5) {
+                        System.out.println("doCreateNewCar()");
+                    } else if (response == 6) {
+                        System.out.println("doViewAllCars()");
+                    } else if (response == 7) {
+                        System.out.println("doViewCarDetails()");
+                    } else if (response == 8) {
+                        System.out.println("doViewTransitDriverDispatchRecords()");
+                    } else if (response == 9) {
+                        System.out.println("doAssignTransitDriver()");
+                    } else if (response == 10) {
+                        System.out.println("doUpdateTransit()");
+                    } else if (response == 11) {
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
 
-                } else if (response == 11) {
+                if (response == 11) {
                     break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
                 }
             }
-
-            if (response == 11) {
-                break;
-            }
+        } else {
+            throw new InvalidAccessRightException("You don't have rights to access the Operations Management module.");
         }
     }
 

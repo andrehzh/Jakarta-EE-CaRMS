@@ -48,8 +48,7 @@ public class Customer implements Serializable {
     @OneToOne
     private CreditCard creditCard;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = true)
     private Partner partner;
     
     public Customer() {

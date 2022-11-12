@@ -44,7 +44,7 @@ public class MainApp {
 
     public MainApp(CarSessionBeanRemote carSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, CreditCardSessionBeanRemote creditCardSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
         this();
-        
+
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
@@ -71,6 +71,7 @@ public class MainApp {
                 if (response == 1) {
                     try {
                         doCustomerLogin();
+                        System.out.println("*** Successfull Logged In! ***\n");
                     } catch (InvalidLoginCredentialException ex) {
                         ex.printStackTrace();
                     }
@@ -92,21 +93,27 @@ public class MainApp {
     }
 
     private void doCustomerLogin() throws InvalidLoginCredentialException {
-        Scanner scanner = new Scanner(System.in);
-        String passportNumber = "";
-        String password = "";
+        if (currentOwnCustomer == null) {
 
-        System.out.println("*** CaRMS Reservation Client :: Login ***\n");
-        System.out.print("Enter passsport number> ");
-        passportNumber = scanner.nextLine().trim();
-        System.out.print("Enter password> ");
-        password = scanner.nextLine().trim();
+            Scanner scanner = new Scanner(System.in);
+            String passportNumber = "";
+            String password = "";
 
-        if (passportNumber.length() > 0 && password.length() > 0) {
-            currentOwnCustomer = customerSessionBeanRemote.customerLogin(passportNumber, password);
+            System.out.println("*** CaRMS Reservation Client :: Login ***\n");
+            System.out.print("Enter passsport number> ");
+            passportNumber = scanner.nextLine().trim();
+            System.out.print("Enter password> ");
+            password = scanner.nextLine().trim();
+
+            if (passportNumber.length() > 0 && password.length() > 0) {
+                currentOwnCustomer = customerSessionBeanRemote.customerLogin(passportNumber, password);
+            } else {
+                throw new InvalidLoginCredentialException("Missing Login Credentials!");
+            }
         } else {
-            throw new InvalidLoginCredentialException("Missing Login Credentials!");
+            throw new InvalidLoginCredentialException("Already Logged In!");
         }
+
     }
 
     private void doRegisterNewCustomer() {
@@ -114,15 +121,15 @@ public class MainApp {
         OwnCustomer newOwnCustomer = new OwnCustomer();
 
         System.out.println("*** CaRMS Reservation Client :: Registration ***\n");
-        System.out.println("Enter name> ");
+        System.out.print("Enter name> ");
         newOwnCustomer.setCustomerName(scanner.nextLine().trim());
-        System.out.println("Enter email> ");
+        System.out.print("Enter email> ");
         newOwnCustomer.setCustomerEmail(scanner.nextLine().trim());
-        System.out.println("Enter password> ");
+        System.out.print("Enter password> ");
         newOwnCustomer.setCustomerPassword(scanner.nextLine().trim());
-        System.out.println("Enter passport number> ");
+        System.out.print("Enter passport number> ");
         newOwnCustomer.setPassportNumber(scanner.nextLine().trim());
-        System.out.println("Enter phone number> ");
+        System.out.print("Enter phone number> ");
         newOwnCustomer.setCustomerPhoneNum(scanner.nextLine().trim());
 
         Set<ConstraintViolation<OwnCustomer>> constraintViolations = validator.validate(newOwnCustomer);
@@ -132,7 +139,7 @@ public class MainApp {
                 Long newOwnCustomerId = customerSessionBeanRemote.createNewOwnCustomer(newOwnCustomer);
                 System.out.println("New Customer created successfully!: " + newOwnCustomerId + "\n");
             } catch (CustomerEmailExistException ex) {
-                System.out.println("An error has occurred while creating the new staff!: The user name already exist\n");
+                System.out.println("An error has occurred while creating the new Customer!: The customer email already exist\n");
             } catch (UnknownPersistenceException ex) {
                 System.out.println("An unknown error has occurred while creating the new staff!: " + ex.getMessage() + "\n");
             } catch (InputDataValidationException ex) {
