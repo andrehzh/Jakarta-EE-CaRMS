@@ -47,10 +47,11 @@ public class SalesManagementModule {
         validator = validatorFactory.getValidator();
     }
 
-    public SalesManagementModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, Employee currentEmployee) {
+    public SalesManagementModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, Employee currentEmployee, CategorySessionBeanRemote categorySessionBeanRemote) {
         this();
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.currentEmployee = currentEmployee;
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
     }
 
     public void menuSalesManagement() throws InvalidAccessRightException {
@@ -74,12 +75,11 @@ public class SalesManagementModule {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    System.out.println("Vibes test\n");
                     doCreateNewRentalRate();
                 } else if (response == 2) {
-
+                    doViewAllRentalRates();
                 } else if (response == 3) {
-
+                    doViewRentalRateDetails();
                 } else if (response == 4) {
                     break;
                 } else {
@@ -131,7 +131,7 @@ public class SalesManagementModule {
                 Long newRentalRateId = rentalRateSessionBeanRemote.createNewRentalRate(newRentalRate);
                 System.out.println("New Rental Rate created successfully!: " + newRentalRateId + "\n");
             } catch (UnknownPersistenceException ex) {
-                System.out.println("An unknown error has occurred while creating the new rentalRate!: " + ex.getMessage() + "\n");
+                System.out.println("An unknown error has occurred while creating the new Rental Rate!: " + ex.getMessage() + "\n");
             } catch (InputDataValidationException ex) {
                 System.out.println(ex.getMessage() + "\n");
             }
@@ -191,7 +191,7 @@ public class SalesManagementModule {
         Integer integerInput;
         BigDecimal bigDecimalInput;
 
-        System.out.println("*** CaRMS Management Client :: Sales Management :: View All Rental Rates :: Update Rental Rate ***\n");
+        System.out.println("*** CaRMS Management Client :: Sales Management :: View Rental Rate Details :: Update Rental Rate ***\n");
         System.out.print("Enter Name (blank if no change)> ");
         input = scanner.nextLine().trim();
         if (input.length() > 0) {
@@ -242,7 +242,7 @@ public class SalesManagementModule {
                 rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
                 System.out.println("Rental Rate updated successfully!\n");
             } catch (RentalRateNotFoundException | UpdateRentalRateException ex) {
-                System.out.println("An error has occurred while updating rental rate: " + ex.getMessage() + "\n");
+                System.out.println("An error has occurred while updating Rental Rate: " + ex.getMessage() + "\n");
             } catch (InputDataValidationException ex) {
                 System.out.println(ex.getMessage() + "\n");
             }
@@ -255,7 +255,7 @@ public class SalesManagementModule {
         Scanner scanner = new Scanner(System.in);
         String input;
 
-        System.out.println("*** CaRMS Management Client :: Sales Management :: View All Rental Rates :: Delete Rental Rate ***\n");
+        System.out.println("*** CaRMS Management Client :: Sales Management :: View Rental Rate Details :: Delete Rental Rate ***\n");
         System.out.printf("Confirm Delete Rental Rate %s (Type: %s) (Enter 'Y' to Delete)> ", rentalRate.getRentalRateName(), rentalRate.getRentalRateType());
         input = scanner.nextLine().trim();
 
