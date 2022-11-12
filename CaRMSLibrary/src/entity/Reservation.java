@@ -40,47 +40,49 @@ public class Reservation implements Serializable {
     private String reservationNumber;
     @Column(nullable = false)
     @NotNull
-    private List<LocalDateTime> reservationDate;
+    private LocalDateTime pickUpDateTime;
     @Column(nullable = false)
     @NotNull
-    private LocalTime pickUpTime;
-    @Column(nullable = false)
-    @NotNull
-    private LocalTime dropOffTime;
-    
+    private LocalDateTime dropOffDateTime;
+
     @ManyToOne
     private Partner partner;
-    
+
     @ManyToOne
     private OwnCustomer ownCustomer;
-    
+
     @OneToOne
     private ReservationTransaction reservationTransaction;
-    
+
     @OneToMany
     private List<RentalRate> rentalRates;
-    
+
     @ManyToOne
     private Car car;
-    
-    @ManyToMany
-    @JoinColumn(nullable = false)
-    private List<Outlet> outlets;
+
+    @ManyToOne
+    private Outlet pickUpOutlet;
+
+    @ManyToOne
+    private Outlet dropOffOutlet;
+
+    @OneToOne
+    private CarModel carModel;
+
+    @OneToOne
+    private Category category;
 
     public Reservation() {
-        reservationDate = new ArrayList<>();
-        
+
         rentalRates = new ArrayList<>();
-        outlets = new ArrayList<>();
     }
 
-    public Reservation(String reservationNumber, List<LocalDateTime> reservationDate, LocalTime pickUpTime, LocalTime dropOffTime) {
+    public Reservation(String reservationNumber, LocalDateTime pickUpDateTime, LocalDateTime dropOffDateTime) {
         this();
-        
+
         this.reservationNumber = reservationNumber;
-        this.reservationDate = reservationDate;
-        this.pickUpTime = pickUpTime;
-        this.dropOffTime = dropOffTime;
+        this.pickUpDateTime = pickUpDateTime;
+        this.dropOffDateTime = dropOffDateTime;
     }
 
     public Long getReservationId() {
@@ -89,6 +91,90 @@ public class Reservation implements Serializable {
 
     public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
+    }
+
+    /**
+     * @return the category
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    /**
+     * @param category the category to set
+     */
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    /**
+     * @return the pickUpOutlet
+     */
+    public Outlet getPickUpOutlet() {
+        return pickUpOutlet;
+    }
+
+    /**
+     * @param pickUpOutlet the pickUpOutlet to set
+     */
+    public void setPickUpOutlet(Outlet pickUpOutlet) {
+        this.pickUpOutlet = pickUpOutlet;
+    }
+
+    /**
+     * @return the dropOffOutlet
+     */
+    public Outlet getDropOffOutlet() {
+        return dropOffOutlet;
+    }
+
+    /**
+     * @param dropOffOutlet the dropOffOutlet to set
+     */
+    public void setDropOffOutlet(Outlet dropOffOutlet) {
+        this.dropOffOutlet = dropOffOutlet;
+    }
+
+    /**
+     * @return the carModel
+     */
+    public CarModel getCarModel() {
+        return carModel;
+    }
+
+    /**
+     * @param carModel the carModel to set
+     */
+    public void setCarModel(CarModel carModel) {
+        this.carModel = carModel;
+    }
+
+    /**
+     * @return the pickUpDateTime
+     */
+    public LocalDateTime getPickUpDateTime() {
+        return pickUpDateTime;
+    }
+
+    /**
+     * @param pickUpDateTime the pickUpDateTime to set
+     */
+    public void setPickUpDateTime(LocalDateTime pickUpDateTime) {
+        this.pickUpDateTime = pickUpDateTime;
+    }
+
+    /**
+     * @return the dropOffDateTime
+     */
+    public LocalDateTime getDropOffDateTime() {
+        return dropOffDateTime;
+    }
+
+    /**
+     * @param dropOffDateTime the dropOffDateTime to set
+     */
+    public void setDropOffDateTime(LocalDateTime dropOffDateTime) {
+        this.dropOffDateTime = dropOffDateTime;
     }
 
     /**
@@ -105,7 +191,6 @@ public class Reservation implements Serializable {
         this.car = car;
     }
 
-    
     /**
      * @return the partner
      */
@@ -119,7 +204,7 @@ public class Reservation implements Serializable {
     public void setPartner(Partner partner) {
         this.partner = partner;
     }
-    
+
     /**
      * @return the ownCustomer
      */
@@ -163,20 +248,6 @@ public class Reservation implements Serializable {
     }
 
     /**
-     * @return the outlets
-     */
-    public List<Outlet> getOutlets() {
-        return outlets;
-    }
-
-    /**
-     * @param outlets the outlets to set
-     */
-    public void setOutlets(List<Outlet> outlets) {
-        this.outlets = outlets;
-    }
-
-    /**
      * @return the reservationNumber
      */
     public String getReservationNumber() {
@@ -188,48 +259,6 @@ public class Reservation implements Serializable {
      */
     public void setReservationNumber(String reservationNumber) {
         this.reservationNumber = reservationNumber;
-    }
-
-    /**
-     * @return the reservationDate
-     */
-    public List<LocalDateTime> getReservationDate() {
-        return reservationDate;
-    }
-
-    /**
-     * @param reservationDate the reservationDate to set
-     */
-    public void setReservationDate(List<LocalDateTime> reservationDate) {
-        this.reservationDate = reservationDate;
-    }
-
-    /**
-     * @return the pickUpTime
-     */
-    public LocalTime getPickUpTime() {
-        return pickUpTime;
-    }
-
-    /**
-     * @param pickUpTime the pickUpTime to set
-     */
-    public void setPickUpTime(LocalTime pickUpTime) {
-        this.pickUpTime = pickUpTime;
-    }
-
-    /**
-     * @return the dropOffTime
-     */
-    public LocalTime getDropOffTime() {
-        return dropOffTime;
-    }
-
-    /**
-     * @param dropOffTime the dropOffTime to set
-     */
-    public void setDropOffTime(LocalTime dropOffTime) {
-        this.dropOffTime = dropOffTime;
     }
 
     @Override

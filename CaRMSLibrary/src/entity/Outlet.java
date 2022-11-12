@@ -44,15 +44,19 @@ public class Outlet implements Serializable {
     @OneToOne(mappedBy = "outlets")
     private TransitDriverDispatchRecord transitDriverDispatchRecord;
     
-    @ManyToMany(mappedBy = "outlets")
-    private List<Reservation> reservations;
+    @OneToMany(mappedBy = "pickUpOutlet")
+    private List<Reservation> reservationsPickUp;
+    
+    @OneToMany(mappedBy = "dropOffOutlet")
+    private List<Reservation> reservationsDropOff;
     
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
 
     public Outlet() {
         employees = new ArrayList<>();
-        reservations = new ArrayList<>();
+        reservationsPickUp = new ArrayList<>();
+        reservationsDropOff = new ArrayList<>();
         cars = new ArrayList<>();
     }
 
@@ -70,6 +74,34 @@ public class Outlet implements Serializable {
 
     public void setOutletId(Long outletId) {
         this.outletId = outletId;
+    }
+
+    /**
+     * @return the reservationsPickUp
+     */
+    public List<Reservation> getReservationsPickUp() {
+        return reservationsPickUp;
+    }
+
+    /**
+     * @param reservationsPickUp the reservationsPickUp to set
+     */
+    public void setReservationsPickUp(List<Reservation> reservationsPickUp) {
+        this.reservationsPickUp = reservationsPickUp;
+    }
+
+    /**
+     * @return the reservationsDropOff
+     */
+    public List<Reservation> getReservationsDropOff() {
+        return reservationsDropOff;
+    }
+
+    /**
+     * @param reservationsDropOff the reservationsDropOff to set
+     */
+    public void setReservationsDropOff(List<Reservation> reservationsDropOff) {
+        this.reservationsDropOff = reservationsDropOff;
     }
 
     /**
@@ -98,20 +130,6 @@ public class Outlet implements Serializable {
      */
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
-    }
-
-    /**
-     * @return the reservations
-     */
-    public List<Reservation> getReservations() {
-        return reservations;
-    }
-
-    /**
-     * @param reservations the reservations to set
-     */
-    public void setReservations(List<Reservation> reservations) {
-        this.reservations = reservations;
     }
 
     /**

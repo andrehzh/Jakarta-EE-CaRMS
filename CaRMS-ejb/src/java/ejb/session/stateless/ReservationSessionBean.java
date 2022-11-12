@@ -95,14 +95,16 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 Reservation reservationToUpdate = retrieveReservationByReservationId(reservation.getReservationId());
                 
                 if (reservationToUpdate.getReservationNumber().equals(reservation.getReservationNumber())) {
-                    reservationToUpdate.setReservationDate(reservation.getReservationDate());
-                    reservationToUpdate.setPickUpTime(reservation.getPickUpTime());
-                    reservationToUpdate.setDropOffTime(reservation.getDropOffTime());
+                    reservationToUpdate.setPickUpDateTime(reservation.getPickUpDateTime());
+                    reservationToUpdate.setDropOffDateTime(reservation.getDropOffDateTime());
                     reservationToUpdate.setPartner(reservation.getPartner());
                     reservationToUpdate.setOwnCustomer(reservation.getOwnCustomer());
                     reservationToUpdate.setReservationTransaction(reservation.getReservationTransaction());
                     reservationToUpdate.setRentalRates(reservation.getRentalRates());
-                    reservationToUpdate.setOutlets(reservation.getOutlets());
+                    reservationToUpdate.setCarModel(reservation.getCarModel());
+                    reservationToUpdate.setPickUpOutlet(reservation.getPickUpOutlet());
+                    reservationToUpdate.setDropOffOutlet(reservation.getDropOffOutlet());
+                    reservationToUpdate.setCategory(reservation.getCategory());
                     // able to update everything except number cause unique
                 } else {
                     throw new UpdateReservationException("UpdateReservationException");
