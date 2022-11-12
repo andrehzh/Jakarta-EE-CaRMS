@@ -36,8 +36,6 @@ public class Category implements Serializable {
     @Column(nullable = false)
     @NotNull
     private String categoryDesc;
-    
-    @OneToMany
 
     @OneToMany(mappedBy = "carCategory")
     private List<RentalRate> rentalRates;
@@ -143,6 +141,5 @@ public class Category implements Serializable {
     public void setCategoryDesc(String categoryDesc) {
         this.categoryDesc = categoryDesc;
     }
-    
 
 }
