@@ -85,6 +85,17 @@ public class Reservation implements Serializable {
         this.dropOffDateTime = dropOffDateTime;
     }
 
+    public Reservation(String reservationNumber, LocalDateTime pickUpDateTime, LocalDateTime dropOffDateTime, Outlet pickUpOutlet, Outlet dropOffOutlet) {
+        this(); 
+        this.reservationNumber = reservationNumber;
+        this.pickUpDateTime = pickUpDateTime;
+        this.dropOffDateTime = dropOffDateTime;
+        this.pickUpOutlet = pickUpOutlet;
+        this.dropOffOutlet = dropOffOutlet;
+    }
+    
+    
+
     public Long getReservationId() {
         return reservationId;
     }
