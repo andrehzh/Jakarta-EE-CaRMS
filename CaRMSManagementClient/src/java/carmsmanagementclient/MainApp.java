@@ -5,11 +5,14 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
 import entity.Employee;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -26,15 +29,23 @@ public class MainApp {
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CategorySessionBeanRemote categorySessionBeanRemote;
     private SalesManagementModule salesManagementModule;
-
+    private OpsManagementModule opsManagementModule;
+    private CarModelSessionBeanRemote carModelSessionBeanRemote;
+    private CarSessionBeanRemote carSessionBeanRemote;
+    private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
+    
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.categorySessionBeanRemote = categorySessionBeanRemote;
+        this.carModelSessionBeanRemote = carModelSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
+        this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
+        
     }
 
     public void runApp() {
@@ -57,7 +68,8 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login successful!\n");
 
-                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, currentEmployee);
+                        salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, currentEmployee, categorySessionBeanRemote);
+                        opsManagementModule = new OpsManagementModule(carModelSessionBeanRemote, carSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, currentEmployee, employeeSessionBeanRemote, categorySessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
@@ -117,12 +129,12 @@ public class MainApp {
                     } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
-//                } else if (response == 2) {
-////                    try {
-//////                        systemAdministrationModule.menuSystemAdministration();
-////                    } catch (InvalidAccessRightException ex) {
-////                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-////                    }
+                } else if (response == 2) {
+                    try {
+                        opsManagementModule.menuOpsManagement();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
 //                } else if (response == 3) {
 ////                    
 //                } else if (response == 4) {

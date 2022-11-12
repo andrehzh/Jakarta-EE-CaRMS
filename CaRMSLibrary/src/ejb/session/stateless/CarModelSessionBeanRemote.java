@@ -34,4 +34,6 @@ public interface CarModelSessionBeanRemote {
     public void deleteCarModel(Long carModelId) throws CarModelNotFoundException, DeleteCarModelException;
 
     public CarModel retrieveCarModelByCarModelName(String carModelName) throws CarModelNotFoundException;
+
+    public CarModel retrieveCarModelByBrandAndName(String carModelBrand, String carModelName) throws CarModelNotFoundException;
 }

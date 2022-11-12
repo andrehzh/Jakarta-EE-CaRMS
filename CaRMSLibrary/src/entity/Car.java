@@ -49,7 +49,7 @@ public class Car implements Serializable {
     private CarModel carModel;
     
     @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     private Outlet outlet;
     
     @OneToMany(mappedBy = "car")
