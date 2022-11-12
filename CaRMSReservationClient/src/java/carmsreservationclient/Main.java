@@ -5,17 +5,38 @@
  */
 package carmsreservationclient;
 
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CreditCardSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.PartnerSessionBeanRemote;
+import javax.ejb.EJB;
+
 /**
  *
  * @author andre
  */
 public class Main {
 
+    @EJB
+    private static CarSessionBeanRemote carSessionBeanRemote;
+
+    @EJB
+    private static PartnerSessionBeanRemote partnerSessionBeanRemote;
+
+    @EJB
+    private static CreditCardSessionBeanRemote creditCardSessionBeanRemote;
+
+    @EJB
+    private static CustomerSessionBeanRemote customerSessionBeanRemote;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        MainApp mainApp = new MainApp(carSessionBeanRemote, partnerSessionBeanRemote, creditCardSessionBeanRemote, customerSessionBeanRemote);
+        mainApp.runApp(); 
+        
     }
     
 }

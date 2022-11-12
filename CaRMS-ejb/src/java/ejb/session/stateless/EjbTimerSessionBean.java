@@ -184,7 +184,6 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
             } catch (ReservationNotFoundException | CarNotFoundException | UnknownPersistenceException | InputDataValidationException ex) {
                 System.out.println("Something is wrong with EJB Timer Session Bean Java 2");
             }
-
         }
     }
     
