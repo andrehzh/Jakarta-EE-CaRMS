@@ -38,6 +38,8 @@ public class Category implements Serializable {
     private String categoryDesc;
     
     @OneToMany
+
+    @OneToMany(mappedBy = "carCategory")
     private List<RentalRate> rentalRates;
     
     @OneToMany(fetch = FetchType.LAZY)
@@ -142,4 +144,5 @@ public class Category implements Serializable {
         this.categoryDesc = categoryDesc;
     }
     
+
 }
