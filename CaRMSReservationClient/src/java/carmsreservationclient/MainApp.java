@@ -328,13 +328,13 @@ public class MainApp {
 
                     if (response > 0 && response < catRef) {
                         selectedPickUpOutlet = outlets.get(response - 1);
-                        if(selectedPickUpOutlet.getOpeningTime() != null && selectedStartDateTime.toLocalTime().isBefore(selectedPickUpOutlet.getOpeningTime()) 
-                                || selectedPickUpOutlet.getClosingTime()!= null && selectedStartDateTime.toLocalTime().isAfter(selectedPickUpOutlet.getClosingTime())) {
+                        if (selectedPickUpOutlet.getOpeningTime() != null && selectedStartDateTime.toLocalTime().isBefore(selectedPickUpOutlet.getOpeningTime())
+                                || selectedPickUpOutlet.getClosingTime() != null && selectedStartDateTime.toLocalTime().isAfter(selectedPickUpOutlet.getClosingTime())) {
                             System.out.println("You have selected Outlet: " + selectedPickUpOutlet.getOutletName() + " it is unavailable at that time please choose again!\n");
                             response = 0;
                         } else {
-                        System.out.println("You have selected Outlet: " + selectedPickUpOutlet.getOutletName() + "!\n");
-                        break;
+                            System.out.println("You have selected Outlet: " + selectedPickUpOutlet.getOutletName() + "!\n");
+                            break;
                         }
                     } else {
                         System.out.println("Invalid option, please try again!\n");
@@ -349,13 +349,13 @@ public class MainApp {
 
                     if (response > 0 && response < catRef) {
                         selectedDropOffOutlet = outlets.get(response - 1);
-                        if(selectedDropOffOutlet.getOpeningTime() != null && selectedEndDateTime.toLocalTime().isBefore(selectedDropOffOutlet.getOpeningTime()) 
-                                || selectedDropOffOutlet.getClosingTime()!= null && selectedEndDateTime.toLocalTime().isAfter(selectedDropOffOutlet.getClosingTime())) {
+                        if (selectedDropOffOutlet.getOpeningTime() != null && selectedEndDateTime.toLocalTime().isBefore(selectedDropOffOutlet.getOpeningTime())
+                                || selectedDropOffOutlet.getClosingTime() != null && selectedEndDateTime.toLocalTime().isAfter(selectedDropOffOutlet.getClosingTime())) {
                             System.out.println("You have selected Outlet: " + selectedPickUpOutlet.getOutletName() + " it is unavailable at that time please choose again!\n");
                             response = 0;
                         } else {
-                        System.out.println("You have selected Category: " + selectedDropOffOutlet.getOutletName() + "!\n");
-                        break;
+                            System.out.println("You have selected Category: " + selectedDropOffOutlet.getOutletName() + "!\n");
+                            break;
                         }
                     } else {
                         System.out.println("Invalid option, please try again!\n");
@@ -397,7 +397,7 @@ public class MainApp {
             Reservation searchReservation = new Reservation();
             searchReservation.setCategory(selectedCategory);
             searchReservation.setCarModel(selectedCarModel);
-            searchReservation.setPickUpDateTime(selectedEndDateTime);
+            searchReservation.setPickUpDateTime(selectedStartDateTime);
             searchReservation.setDropOffDateTime(selectedEndDateTime);
             searchReservation.setPickUpOutlet(selectedPickUpOutlet);
             searchReservation.setDropOffOutlet(selectedDropOffOutlet);
@@ -439,24 +439,43 @@ public class MainApp {
                 //i want to keep all the conflicting reservations
                 if (categoryRequirement == null || categoryRequirement.equals(searchReservation.getCategory())) {
                     if (cmRequirement == null || cmRequirement.equals(searchReservation.getCarModel())) {
-                        if (pickUpDate.isBefore(searchReservation.getDropOffDateTime()) && dropOffDate.isAfter(searchReservation.getPickUpDateTime())) {
 
+//                        if (pickUpDate.isBefore(searchReservation.getDropOffDateTime()) && dropOffDate.isAfter(searchReservation.getPickUpDateTime())) {
+//
+//                            conflictingReservations.add(pendingReservation);
+//
+//                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime()) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())) {
+//
+//                            conflictingReservations.add(pendingReservation);
+//
+//                        } else if (pickUpDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2)) && dropOffDate.isAfter(searchReservation.getPickUpDateTime())
+//                                && (!outletPickUp.equals(searchReservation.getDropOffOutlet()))) {
+//
+//                            conflictingReservations.add(pendingReservation);
+//
+//                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2)) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())
+//                                && (!outletDropOff.equals(searchReservation.getPickUpOutlet()))) {
+//
+//                            conflictingReservations.add(pendingReservation);
+//                        }
+                        if (pickUpDate.isAfter(searchReservation.getPickUpDateTime()) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())) {
                             conflictingReservations.add(pendingReservation);
-
-                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime()) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())) {
-
+                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime()) && dropOffDate.isBefore(searchReservation.getDropOffDateTime())) {
                             conflictingReservations.add(pendingReservation);
-
-                        } else if (pickUpDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2)) && dropOffDate.isAfter(searchReservation.getPickUpDateTime())
-                                && (!outletPickUp.equals(searchReservation.getDropOffOutlet()))) {
-
+                        } else if (pickUpDate.isBefore(searchReservation.getPickUpDateTime()) && pickUpDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2).minusSeconds(30)) 
+                                && !outletPickUp.equals(searchReservation.getPickUpOutlet())) {
                             conflictingReservations.add(pendingReservation);
-
-                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2)) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())
-                                && (!outletDropOff.equals(searchReservation.getPickUpOutlet()))) {
-
+                        } else if (dropOffDate.isBefore(searchReservation.getPickUpDateTime()) && dropOffDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2).minusSeconds(30))
+                                && !outletDropOff.equals(searchReservation.getPickUpOutlet())) {
+                            conflictingReservations.add(pendingReservation);
+                        } else if (pickUpDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2).plusSeconds(30)) && pickUpDate.isAfter(searchReservation.getDropOffDateTime()) 
+                                && !outletPickUp.equals(searchReservation.getPickUpOutlet())) {
+                            conflictingReservations.add(pendingReservation);
+                        } else if (dropOffDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2).plusSeconds(30)) && dropOffDate.isAfter(searchReservation.getDropOffDateTime())
+                                && !outletDropOff.equals(searchReservation.getPickUpOutlet())) {
                             conflictingReservations.add(pendingReservation);
                         }
+
                     }
                 }
             }
@@ -531,7 +550,7 @@ public class MainApp {
                                     System.out.println("Invalid option, please try again!\n");
                                 }
                             }
-                            
+
                             //need to make the new reservation here.
                         } else {
                             throw new InvalidLoginCredentialException("You are not Logged In!");
