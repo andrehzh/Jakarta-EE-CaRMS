@@ -79,7 +79,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     @Override
     public List<CarModel> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+        Query query = em.createQuery("SELECT cm FROM CarModel cm ORDER BY cm.category, cm.carModelBrand, cm.carModelName");
 
         return query.getResultList();
     }
@@ -98,6 +98,19 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     }
 
     @Override
+    public CarModel retrieveCarModelByBrandAndName(String carModelBrand, String carModelName) throws CarModelNotFoundException {
+        try {
+            Query query = em.createQuery("SELECT cm FROM CarModel cm WHERE cm.carModelBrand = :inModelBrand AND cm.carModelName = :inModelName");
+            query.setParameter("inModelBrand", carModelBrand);
+            query.setParameter("inModelName", carModelName);
+
+            return (CarModel) query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw new CarModelNotFoundException();
+        }
+    }
+
+    @Override
     public void updateCarModel(CarModel carModel) throws CarModelNotFoundException, InputDataValidationException, UpdateCarModelException {
         if (carModel != null && carModel.getCarModelId() != null) {
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
@@ -107,6 +120,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
                 try {
                     carModelToUpdate.setCarModelBrand(carModel.getCarModelBrand());
                     carModelToUpdate.setCarModelName(carModel.getCarModelName());
+                    carModelToUpdate.setCategory(carModel.getCategory());
                 } catch (PersistenceException ex) {
                     throw new UpdateCarModelException("UpdateCarModelException");
                 }
