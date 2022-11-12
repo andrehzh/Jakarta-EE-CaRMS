@@ -6,11 +6,12 @@
 package ejb.session.stateless;
 
 import entity.Employee;
-import entity.Outlet;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -19,11 +20,10 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.DeleteEmployeeException;
-import util.exception.DeleteEmployeeException;
 import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
-import util.exception.OutletNotFoundException;
+import util.exception.InvalidLoginCredentialException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateEmployeeException;
 
@@ -81,23 +81,21 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
 
     @Override
+    public Employee retrieveEmployeeByEmployeeEmail(String email) throws EmployeeNotFoundException {
+        try {
+            Query query = em.createQuery("SELECT s FROM Employee s WHERE s.email = :inEmail");
+            query.setParameter("inEmail", email);
+            return (Employee) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new EmployeeNotFoundException("Employee Email " + email + " does not exist!");
+        }
+    }
+
+    @Override
     public List<Employee> retrieveAllEmployees() {
         Query query = em.createQuery("SELECT e FROM Employee e");
 
         return query.getResultList();
-    }
-
-    @Override
-    public Employee retrieveEmployeeByEmployeeEmail(String employeeEmail) throws EmployeeNotFoundException {
-        try {
-            Query query = em.createQuery("SELECT e FROM Employee e WHERE e.employeeEmail = :inEmployeeEmail");
-            query.setParameter("inEmployeeEmail", employeeEmail);
-
-            return (Employee) query.getSingleResult();
-        } catch (PersistenceException ex) {
-            throw new EmployeeNotFoundException();
-        }
-
     }
 
     @Override
@@ -129,6 +127,21 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
             throw new DeleteEmployeeException("Employee " + employeeId.toString() + " is associated with existing Transit Driver Dispatch Record(s) and cannot be deleted!");
         } else {
             em.remove(employeeToRemove);
+        }
+    }
+
+    @Override
+    public Employee employeeLogin(String email, String password) throws InvalidLoginCredentialException {
+        try {
+            Employee employee = retrieveEmployeeByEmployeeEmail(email);
+
+            if (employee.getEmployeePassword().equals(password)) {
+                return employee;
+            } else {
+                throw new InvalidLoginCredentialException("Email does not exist or invalid password!");
+            }
+        } catch (EmployeeNotFoundException ex) {
+            throw new InvalidLoginCredentialException("Email does not exist or invalid password!");
         }
     }
 

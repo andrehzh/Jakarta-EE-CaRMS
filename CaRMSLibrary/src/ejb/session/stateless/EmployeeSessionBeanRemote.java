@@ -13,6 +13,7 @@ import util.exception.DeleteEmployeeException;
 import util.exception.EmployeeEmailExistsException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.InvalidLoginCredentialException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateEmployeeException;
 
@@ -33,5 +34,8 @@ public interface EmployeeSessionBeanRemote {
 
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException;
 
-    public Employee retrieveEmployeeByEmployeeEmail(String employeeEmail) throws EmployeeNotFoundException;
+    public Employee retrieveEmployeeByEmployeeEmail(String email) throws EmployeeNotFoundException;
+
+    public Employee employeeLogin(String email, String password) throws InvalidLoginCredentialException;
+
 }
