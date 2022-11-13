@@ -5,7 +5,9 @@
  */
 package ejb.session.stateless;
 
+import java.time.LocalDateTime;
 import javax.ejb.Remote;
+import util.exception.NoAvailableCarException;
 
 /**
  *
@@ -13,5 +15,8 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface EjbTimerSessionBeanRemote {
+    public void allocateCarsToCurrentDayReservations() throws NoAvailableCarException;
+
+    public void allocateCarsToCurrentDayReservationsInput(LocalDateTime testDate) throws NoAvailableCarException;
     
 }

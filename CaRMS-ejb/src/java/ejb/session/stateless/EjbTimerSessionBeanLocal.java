@@ -5,7 +5,9 @@
  */
 package ejb.session.stateless;
 
+import java.time.LocalDateTime;
 import javax.ejb.Local;
+import util.exception.NoAvailableCarException;
 
 /**
  *
@@ -13,5 +15,9 @@ import javax.ejb.Local;
  */
 @Local
 public interface EjbTimerSessionBeanLocal {
+
+    public void allocateCarsToCurrentDayReservations() throws NoAvailableCarException;
+
+    public void allocateCarsToCurrentDayReservationsInput(LocalDateTime testDate) throws NoAvailableCarException;
     
 }
