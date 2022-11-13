@@ -79,7 +79,7 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     @Override
     public List<CarModel> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModel cm");
+        Query query = em.createQuery("SELECT cm FROM CarModel cm ORDER BY cm.category.categoryName, cm.carModelBrand, cm.carModelName");
 
         return query.getResultList();
     }
@@ -138,7 +138,8 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
         try {
             em.remove(carModelToRemove);
         } catch (PersistenceException ex) {
-            throw new DeleteCarModelException("Car Model " + carModelId.toString() + " cannot be deleted!");
+            carModelToRemove.setIsDisabled(true);
+            throw new DeleteCarModelException("Car Model " + carModelId.toString() + " cannot be deleted and has been disabled instead.");
         }
     }
 

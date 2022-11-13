@@ -8,7 +8,11 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
+
 import ejb.session.stateless.EjbTimerSessionBeanRemote;
+
+import ejb.session.stateless.CustomerSessionBeanRemote;
+
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
@@ -37,13 +41,12 @@ public class Main {
     private static CarSessionBeanRemote carSessionBeanRemote;
     @EJB
     private static TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
-    
-    
-    
-            
+    @EJB
+    private static CustomerSessionBeanRemote customerSessionBeanRemote;
 
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeSessionBeanRemote, outletSessionBeanRemote, rentalRateSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, ejbTimerSessionBeanRemote);
+        MainApp mainApp = new MainApp(employeeSessionBeanRemote, outletSessionBeanRemote, rentalRateSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, ejbTimerSessionBeanRemote, customerSessionBeanRemote);
+
         mainApp.runApp();
     }
 

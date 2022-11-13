@@ -41,40 +41,43 @@ public class Car implements Serializable {
     @Column(nullable = false)
     @NotNull
     private CarStatusEnum carStatus;
-    
+    @Column(nullable = false)
+    @NotNull
+    private boolean isDisabled;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarModel carModel;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = true)
     private Outlet outlet;
-    
+
     @OneToOne(mappedBy = "car")
     private Reservation reservation;
-    
 
     public Car() {
+        this.isDisabled = false;
     }
 
     public Car(String carPlateNumber, String carColor, CarStatusEnum carStatus) {
-        
+
         this.carPlateNumber = carPlateNumber;
         this.carColor = carColor;
         this.carStatus = carStatus;
+        this.isDisabled = false;
     }
 
     public Car(String carPlateNumber, CarStatusEnum carStatus, CarModel carModel, Outlet outlet) {
         this();
-        
+
         this.carPlateNumber = carPlateNumber;
         this.carStatus = carStatus;
         this.carModel = carModel;
         this.outlet = outlet;
         this.carColor = "Orangey Black";
+        this.isDisabled = false;
     }
-    
-    
 
     public Long getCarId() {
         return carId;
@@ -191,6 +194,20 @@ public class Car implements Serializable {
      */
     public void setCarStatus(CarStatusEnum carStatus) {
         this.carStatus = carStatus;
+    }
+
+    /**
+     * @return the isDisabled
+     */
+    public boolean isIsDisabled() {
+        return isDisabled;
+    }
+
+    /**
+     * @param isDisabled the isDisabled to set
+     */
+    public void setIsDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 
 }
