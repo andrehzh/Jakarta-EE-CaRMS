@@ -326,7 +326,7 @@ public class OpsManagementModule {
                     }
                 } else if (response == 2) {
                     newCar.setCarStatus(CarStatusEnum.RESERVED);
-                    System.out.println("Enter Rental Customer> TODO");
+
                 } else if (response == 3) {
                     newCar.setCarStatus(CarStatusEnum.IN_TRANSIT);
                 } else if (response == 4) {
@@ -463,7 +463,7 @@ public class OpsManagementModule {
                     }
                 } else if (response == 2) {
                     car.setCarStatus(CarStatusEnum.RESERVED);
-                    System.out.println("Enter Rental Customer> TODO");
+
                 } else if (response == 3) {
                     car.setCarStatus(CarStatusEnum.IN_TRANSIT);
                 } else if (response == 4) {

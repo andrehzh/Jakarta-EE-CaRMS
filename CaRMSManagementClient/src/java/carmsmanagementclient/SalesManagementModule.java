@@ -123,30 +123,30 @@ public class SalesManagementModule {
         newRentalRate.setRentalAmount(scanner.nextBigDecimal());
 
         System.out.println("*** Please enter the Validity Start Details Accordingly ***");
-        System.out.print("Enter Year(2022)> ");
+        System.out.print("Enter Year(YYYY)> ");
         year = scanner.nextInt();
-        System.out.print("Enter Month(12)> ");
+        System.out.print("Enter Month(MM)> ");
         month = scanner.nextInt();
-        System.out.print("Enter Day(15)> ");
+        System.out.print("Enter Day(DD)> ");
         day = scanner.nextInt();
-        System.out.print("Enter Hour(22)> ");
+        System.out.print("Enter Hour(hh)> ");
         hour = scanner.nextInt();
-        System.out.print("Enter Minute(15)> ");
+        System.out.print("Enter Minute(mm)> ");
         minute = scanner.nextInt();
 
         newRentalRate.setStartDateTime(LocalDateTime.of(year, month, day, hour, minute));
         System.out.println("The rental rate START date is: " + newRentalRate.getStartDateTime().toString() + "\n");
 
         System.out.println("*** Please enter the Validity End Details Accordingly ***");
-        System.out.print("Enter Year(2022)> ");
+        System.out.print("Enter Year(YYYY)> ");
         year = scanner.nextInt();
-        System.out.print("Enter Month(12)> ");
+        System.out.print("Enter Month(MM)> ");
         month = scanner.nextInt();
-        System.out.print("Enter Day(15)> ");
+        System.out.print("Enter Day(DD)> ");
         day = scanner.nextInt();
-        System.out.print("Enter Hour(22)> ");
+        System.out.print("Enter Hour(hh)> ");
         hour = scanner.nextInt();
-        System.out.print("Enter Minute(15)> ");
+        System.out.print("Enter Minute(mm)> ");
         minute = scanner.nextInt();
 
         newRentalRate.setEndDateTime(LocalDateTime.of(year, month, day, hour, minute));
@@ -292,15 +292,15 @@ public class SalesManagementModule {
         input = scanner.next().trim();
         if (input.equals("y") || input.equals("Y")) {
             System.out.println("*** Please enter the Validity Start Details Accordingly ***");
-            System.out.print("Enter Year(2022)> ");
+            System.out.print("Enter Year(YYYY)> ");
             year = scanner.nextInt();
-            System.out.print("Enter Month(12)> ");
+            System.out.print("Enter Month(MM)> ");
             month = scanner.nextInt();
-            System.out.print("Enter Day(15)> ");
+            System.out.print("Enter Day(DD)> ");
             day = scanner.nextInt();
-            System.out.print("Enter Hour(22)> ");
+            System.out.print("Enter Hour(hh)> ");
             hour = scanner.nextInt();
-            System.out.print("Enter Minute(15)> ");
+            System.out.print("Enter Minute(mm)> ");
             minute = scanner.nextInt();
 
             rentalRate.setStartDateTime(LocalDateTime.of(year, month, day, hour, minute));
@@ -311,15 +311,15 @@ public class SalesManagementModule {
         input = scanner.nextLine().trim();
         if (input.equals("y") || input.equals("Y")) {
             System.out.println("*** Please enter the Validity End Details Accordingly ***");
-            System.out.print("Enter Year(2022)> ");
+            System.out.print("Enter Year(YYYY)> ");
             year = scanner.nextInt();
-            System.out.print("Enter Month(12)> ");
+            System.out.print("Enter Month(MM)> ");
             month = scanner.nextInt();
-            System.out.print("Enter Day(15)> ");
+            System.out.print("Enter Day(DD)> ");
             day = scanner.nextInt();
-            System.out.print("Enter Hour(22)> ");
+            System.out.print("Enter Hour(hh)> ");
             hour = scanner.nextInt();
-            System.out.print("Enter Minute(15)> ");
+            System.out.print("Enter Minute(mm)> ");
             minute = scanner.nextInt();
 
             rentalRate.setEndDateTime(LocalDateTime.of(year, month, day, hour, minute));
