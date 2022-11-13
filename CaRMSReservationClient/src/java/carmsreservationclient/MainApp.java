@@ -15,7 +15,9 @@ import entity.CarModel;
 import entity.Category;
 import entity.Outlet;
 import entity.OwnCustomer;
+import entity.RentalRate;
 import entity.Reservation;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +36,7 @@ import util.exception.InputDataValidationException;
 import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.NoAvailableCarException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /*
@@ -407,16 +410,14 @@ public class MainApp {
             List<Car> availableCars = new ArrayList<>();
             for (Car car : allCars) {
                 if (car.getCarStatus() == CarStatusEnum.AVAILABLE) {
-                    car.setReservations(new ArrayList<>());
                     availableCars.add(car);
                 }
             }
 
-            System.out.println(availableCars.toString());
-
+//            System.out.println(availableCars.toString());
             //sorts the pending reservations by earliest
             Collections.sort(pendingReservations, (Reservation o1, Reservation o2) -> o1.getPickUpDateTime().compareTo(o2.getPickUpDateTime()));
-            System.out.println(pendingReservations.toString());
+//            System.out.println(pendingReservations.toString());
 
             //find conflicting reservations
             //loop through the list to find similar or conflicting reservations and get a number of conflicting reservations?
@@ -439,36 +440,17 @@ public class MainApp {
                 //i want to keep all the conflicting reservations
                 if (categoryRequirement == null || categoryRequirement.equals(searchReservation.getCategory())) {
                     if (cmRequirement == null || cmRequirement.equals(searchReservation.getCarModel())) {
-
-//                        if (pickUpDate.isBefore(searchReservation.getDropOffDateTime()) && dropOffDate.isAfter(searchReservation.getPickUpDateTime())) {
-//
-//                            conflictingReservations.add(pendingReservation);
-//
-//                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime()) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())) {
-//
-//                            conflictingReservations.add(pendingReservation);
-//
-//                        } else if (pickUpDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2)) && dropOffDate.isAfter(searchReservation.getPickUpDateTime())
-//                                && (!outletPickUp.equals(searchReservation.getDropOffOutlet()))) {
-//
-//                            conflictingReservations.add(pendingReservation);
-//
-//                        } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2)) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())
-//                                && (!outletDropOff.equals(searchReservation.getPickUpOutlet()))) {
-//
-//                            conflictingReservations.add(pendingReservation);
-//                        }
                         if (pickUpDate.isAfter(searchReservation.getPickUpDateTime()) && pickUpDate.isBefore(searchReservation.getDropOffDateTime())) {
                             conflictingReservations.add(pendingReservation);
                         } else if (dropOffDate.isAfter(searchReservation.getPickUpDateTime()) && dropOffDate.isBefore(searchReservation.getDropOffDateTime())) {
                             conflictingReservations.add(pendingReservation);
-                        } else if (pickUpDate.isBefore(searchReservation.getPickUpDateTime()) && pickUpDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2).minusSeconds(30)) 
+                        } else if (pickUpDate.isBefore(searchReservation.getPickUpDateTime()) && pickUpDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2).minusSeconds(30))
                                 && !outletPickUp.equals(searchReservation.getPickUpOutlet())) {
                             conflictingReservations.add(pendingReservation);
                         } else if (dropOffDate.isBefore(searchReservation.getPickUpDateTime()) && dropOffDate.isAfter(searchReservation.getPickUpDateTime().minusHours(2).minusSeconds(30))
                                 && !outletDropOff.equals(searchReservation.getPickUpOutlet())) {
                             conflictingReservations.add(pendingReservation);
-                        } else if (pickUpDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2).plusSeconds(30)) && pickUpDate.isAfter(searchReservation.getDropOffDateTime()) 
+                        } else if (pickUpDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2).plusSeconds(30)) && pickUpDate.isAfter(searchReservation.getDropOffDateTime())
                                 && !outletPickUp.equals(searchReservation.getPickUpOutlet())) {
                             conflictingReservations.add(pendingReservation);
                         } else if (dropOffDate.isBefore(searchReservation.getDropOffDateTime().plusHours(2).plusSeconds(30)) && dropOffDate.isAfter(searchReservation.getDropOffDateTime())
@@ -480,7 +462,7 @@ public class MainApp {
                 }
             }
 
-            System.out.println(conflictingReservations.toString());
+//            System.out.println(conflictingReservations.toString());
             //check the cars to see which fits
             //now all i have to do is minus
             List<Car> suitableCars = new ArrayList<>();
@@ -504,12 +486,12 @@ public class MainApp {
                 }
                 suitableCars.removeAll(allocatedCars);
 
-                System.out.println(suitableCars.toString());
+//                System.out.println(suitableCars.toString());
                 //display the cars in a string and let the user choose
                 System.out.println("*** Here is the list of available cars you can choose from! ***\n");
                 catRef = 0;
                 for (Car car : suitableCars) {
-
+                    //BigDecimal price = getReservationPrice(car.getCarModel().getCategory(), searchReservation);
                     System.out.println(catRef + 1 + ": " + car.getCarModel().getCategory().getCategoryName() + " " + car.getCarModel().getCarModelBrand() + " " + car.getCarModel().getCarModelName() + " " + car.getCarColor());
                     catRef++;
 
@@ -530,7 +512,7 @@ public class MainApp {
                             System.out.println("*** Please select your preferred vehicle! ***\n");
                             catRef = 0;
                             for (Car car : suitableCars) {
-
+                                //BigDecimal price = getReservationPrice(car.getCarModel().getCategory(), searchReservation);
                                 System.out.println(catRef + 1 + ": " + car.getCarModel().getCategory().getCategoryName() + " " + car.getCarModel().getCarModelBrand() + " " + car.getCarModel().getCarModelName() + " " + car.getCarColor());
                                 catRef++;
 
@@ -569,6 +551,47 @@ public class MainApp {
         } catch (NoAvailableCarException | InvalidLoginCredentialException ex) {
             ex.printStackTrace();
         }
+
+    }
+
+    private BigDecimal getReservationPrice(Category carCategory, Reservation reservation) {
+        LocalDateTime startDate = reservation.getPickUpDateTime();
+        LocalDateTime endDate = reservation.getDropOffDateTime();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        List<LocalDateTime> totalDates = new ArrayList<>();
+        while (!startDate.plusSeconds(1).isAfter(endDate.plusDays(1))) {
+            totalDates.add(startDate);
+            startDate = startDate.plusDays(1);
+        }
+        
+        System.out.println(totalDates.toString());
+        //for every day need to check if has (promo) else (default)
+
+        try {
+            List<RentalRate> categoryRentalRates = rentalRateSessionBeanRemote.retrieveRentalRatesByCategory(carCategory);
+            RentalRate defaultForCategory = null;
+            for (RentalRate rentalRate : categoryRentalRates) {
+                if (rentalRate.getRentalRateType().equals("Default")) {
+                    defaultForCategory = rentalRate;
+                }
+            }
+
+            for (LocalDateTime day : totalDates) {
+                System.out.println(day);
+                RentalRate cheapest = defaultForCategory;
+                for (RentalRate rentalRate : categoryRentalRates) {
+                    if (day.isAfter(rentalRate.getStartDateTime()) && day.isBefore(rentalRate.getEndDateTime()) && rentalRate.getRentalAmount().doubleValue() < defaultForCategory.getRentalAmount().doubleValue()) {
+                        cheapest = rentalRate;
+                    }
+                }
+                System.out.println(totalAmount);
+                totalAmount = totalAmount.add(cheapest.getRentalAmount());
+            }
+        } catch (RentalRateNotFoundException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return totalAmount;
 
     }
 

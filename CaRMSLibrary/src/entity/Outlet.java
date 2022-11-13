@@ -14,9 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -43,10 +42,14 @@ public class Outlet implements Serializable {
     
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
+    
+    @OneToMany
+    private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
 
     public Outlet() {
         employees = new ArrayList<>();
         cars = new ArrayList<>();
+        transitDriverDispatchRecords = new ArrayList<>();
     }
 
     public Outlet(String outletName, LocalTime openingTime, LocalTime closingTime) {
@@ -63,6 +66,20 @@ public class Outlet implements Serializable {
 
     public void setOutletId(Long outletId) {
         this.outletId = outletId;
+    }
+
+    /**
+     * @return the transitDriverDispatchRecords
+     */
+    public List<TransitDriverDispatchRecord> getTransitDriverDispatchRecords() {
+        return transitDriverDispatchRecords;
+    }
+
+    /**
+     * @param transitDriverDispatchRecords the transitDriverDispatchRecords to set
+     */
+    public void setTransitDriverDispatchRecords(List<TransitDriverDispatchRecord> transitDriverDispatchRecords) {
+        this.transitDriverDispatchRecords = transitDriverDispatchRecords;
     }
 
     /**

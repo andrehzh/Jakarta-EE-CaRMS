@@ -42,7 +42,7 @@ public class TransitDriverDispatchRecord implements Serializable {
     @OneToOne
     private Outlet pickUpOutlet;
     
-    @OneToOne
+    @ManyToOne
     private Outlet dropOffOutlet;
 
     public TransitDriverDispatchRecord() {

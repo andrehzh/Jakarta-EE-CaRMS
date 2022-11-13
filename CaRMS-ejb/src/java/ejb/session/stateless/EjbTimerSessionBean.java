@@ -6,17 +6,16 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.CarModel;
+import entity.Category;
+import entity.Outlet;
 import entity.Reservation;
 import entity.TransitDriverDispatchRecord;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
@@ -24,7 +23,9 @@ import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.NoAvailableCarException;
+import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -35,6 +36,9 @@ import util.exception.UnknownPersistenceException;
 public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerSessionBeanLocal {
 
     @EJB
+    private OutletSessionBeanLocal outletSessionBeanLocal;
+
+    @EJB
     private TransitDriverDispatchRecordSessionBeanLocal transitDriverDispatchRecordSessionBeanLocal;
 
     @EJB
@@ -42,18 +46,16 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
 
     @EJB
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
+    
+    
 
     @Schedule(hour = "2", info = "allocateCarsToCurrentDayReservations")
     public void allocateCarsToCurrentDayReservations() throws NoAvailableCarException {
-        //for reservations that are not already on going. filters out any reservation whereby start day passed and end day not here yet.
-        //checks all reservations made 24 hours prior 2am to 2am
-        //supposed to allocate the most efficient and cost savings car
-        //while maximising the capacity of the cars...
-        //something like a reshuffling of cars
-        //cause during search n reserve they have a preliminary sort of reservation towards a car
-        //afterwards it changes/can change..
-        //because idk where the car is gonna be in the future??
-        //what am i accounting for by reshuffling??
+        //go through all reservations
+        //sort those which are happening on the day of execution
+        //iterate through the car list once only once then if take the first yes
+        //if there are no Y take the first YN
+
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
         LocalDateTime currentDateTime = LocalDateTime.now();
         System.out.println("********** EjbTimerSessionBean.allocateCarsToCurrentDayReservations(): Timeout at " + timeStamp);
@@ -61,132 +63,120 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
         List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReservations();
         List<Car> cars = carSessionBeanLocal.retrieveAllCars();
 
+        //get a list of all the requests
+        //go through the list to see which requests we have to process
+        //1. it is ongoing car must be unavailable -> ongoing means that the current day is within their range of days
+        //1b. have to update cars which completed yesterday?
+        //2. it is within TODAY 1.59am - next day 2.00 am must allocate the best AVAILABLE car -> today is equal to reservation's start day
+        //3. after allocating the best car to reservation
+        //4. update car to unavailable
+        //5. done
+        //all requests at the moment
+        List<Reservation> allReservations = reservationSessionBeanLocal.retrieveAllReservations();
+
+        List<Reservation> todayReservations = new ArrayList<>(); //no need to update ongoing reservations cause it is done by use case 26 & 27
+
+        for (Reservation reservation : allReservations) {
+            LocalDateTime startDate = reservation.getPickUpDateTime();
+            LocalDateTime endDate = reservation.getDropOffDateTime();
+            if (startDate.isAfter(currentDateTime.minusMinutes(1)) && startDate.isBefore(currentDateTime.plusDays(1))) {
+                todayReservations.add(reservation);
+            }
+        }
+        System.out.println(todayReservations.toString());
+
+        List<Car> allCars = carSessionBeanLocal.retrieveAllCars();
+
         List<Car> availableCars = new ArrayList<>();
-        for (Car car : cars) {
+
+        for (Car car : allCars) {
             if (car.getCarStatus() == CarStatusEnum.AVAILABLE) {
                 availableCars.add(car);
             }
         }
+        //to allocate best car
+        //iterate through list of car till get a car which is best then break;
+        //remove from the list
+        //if iterate through list of car still no good car then YN car allocated;
+        try {
+            for (Reservation reservation : todayReservations) {
+                Category categoryRequirement = reservation.getCategory();
+                CarModel cmRequirement = reservation.getCarModel();
+                Outlet outletPickUp = reservation.getPickUpOutlet();
+                Outlet outletDropOff = reservation.getDropOffOutlet();
+                LocalDateTime pickUpDate = reservation.getPickUpDateTime();
+                LocalDateTime dropOffDate = reservation.getDropOffDateTime();
 
-        List<Reservation> pendingReservations = new ArrayList<>();
-        for (Reservation reservation : reservations) {
-            if (reservation.getPickUpDateTime().isAfter(currentDateTime) || reservation.getPickUpDateTime().isEqual(currentDateTime)) {
-                pendingReservations.add(reservation);
-            }
-        }
-
-        //sort pendingReservations in order of urgency:
-        //sorting pending reservations.
-        Collections.sort(pendingReservations, (Reservation o1, Reservation o2) -> o1.getPickUpDateTime().compareTo(o2.getPickUpDateTime()));
-
-        for (Reservation reservation : pendingReservations) {
-
-            long bestCarId = 0;
-            boolean needDispatch = true;
-
-            //alldays in abooking
-            long numOfDays = ChronoUnit.DAYS.between(reservation.getPickUpDateTime(), reservation.getDropOffDateTime());
-            List<LocalDateTime> allDays = IntStream.iterate(0, i -> i + 1)
-                    .limit(numOfDays)
-                    .mapToObj(i -> reservation.getPickUpDateTime().plusDays(i))
-                    .collect(Collectors.toList());
-
-            try {
+                List<Car> allocatedBestCars = new ArrayList<>(); //just keep adding later trim to size (1)
+                List<Car> allocatedCarsNeedDispatch = new ArrayList<>(); //only access if allocatedCars is empty.
+                List<Car> allocatedBestCar = new ArrayList<>();// this is the allocated Car
+                List<Car> allocatedCarNeedDispatch = new ArrayList<>();
+                Car allocatedCar = null;
+                System.out.println(allocatedBestCars.toString());
+                //just completely iterate through the list 
                 for (Car car : availableCars) {
-                    //need to iterate thru existing reservations
-                    //check if car is even the correct category
-                    if (reservation.getCategory() == car.getCarModel().getCategory() || reservation.getCategory() == null) {
-                        //check if car is the correct Model
-                        if (reservation.getCarModel() == car.getCarModel() || reservation.getCarModel() == null) {
-
-                            List<Reservation> existingFutureReservations = car.getReservations();
-
-                            boolean noConflict = true;
-                            boolean noMoreDaysToCheck = false;
-
-                            while (noConflict == true && noMoreDaysToCheck == false) {
-                                //check the most broad range for conflict +2 -2 hrs
-                                for (LocalDateTime day : allDays) {
-
-                                    for (Reservation futureReservation : existingFutureReservations) {
-                                        //check that is just nice that means to update best car it must be at the same outlet for pick up 
-                                        //focus on pick up onlyyy
-
-                                        LocalDateTime pickUpDateTimeWithDispatch = reservation.getPickUpDateTime().plusHours(-2);
-                                        LocalDateTime dropOffDateTimeWithDispatch = reservation.getDropOffDateTime().plusHours(2);
-
-                                        //i reached the last day with no conflict at all on the dates
-                                        if (day.toLocalDate().equals(reservation.getDropOffDateTime().toLocalDate())) {
-                                            //check if at the same outlet and if a dispatch is still needed
-                                            if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
-                                                bestCarId = car.getCarId();
-                                                needDispatch = false;
-                                                //breaks the loop
-                                                noMoreDaysToCheck = true;
-                                            } else if (needDispatch && bestCarId == 0) {
-                                                bestCarId = car.getCarId();
-                                            }
-                                            //account for edge cases
-                                            //either or of the days equal to each other but must be first or last ONLY
-                                            //first day is same but have enough time to dispatch
-                                        } else if (day.toLocalDate().equals(reservation.getPickUpDateTime().toLocalDate())
-                                                && day.toLocalDate().equals(futureReservation.getDropOffDateTime().toLocalDate())
-                                                && day.isAfter(futureReservation.getDropOffDateTime())) {
-                                            //need to account for first day looks good but what is subsequent days cmi.
-                                            if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
-                                                //if im only checking the first day i can chill first no need to do anything so j update the dispatch status
-                                                needDispatch = false;
-                                                //supposed to still go thru all the days
-                                            } else if (futureReservation.getDropOffDateTime().isBefore(pickUpDateTimeWithDispatch) || futureReservation.getDropOffDateTime().equals(pickUpDateTimeWithDispatch)) {
-                                                needDispatch = true;
-                                            }
-                                        } else if (day.toLocalDate().equals(reservation.getDropOffDateTime().toLocalDate())
-                                                && day.toLocalDate().equals(futureReservation.getPickUpDateTime().toLocalDate())
-                                                && day.isBefore(futureReservation.getPickUpDateTime())) {
-                                            //check until last day then got issue.... but possible cause same outlet or enough time
-                                            if (reservation.getPickUpOutlet().equals(car.getOutlet()) && needDispatch == true) {
-                                                bestCarId = car.getCarId();
-                                                needDispatch = false;
-                                                //breaks the loop cause last day to check
-                                                noMoreDaysToCheck = true;
-                                            } else if ((futureReservation.getPickUpDateTime().isAfter(dropOffDateTimeWithDispatch) || futureReservation.getPickUpDateTime().equals(dropOffDateTimeWithDispatch))
-                                                    && bestCarId == 0) {
-                                                bestCarId = car.getCarId();
-                                                noMoreDaysToCheck = true;
-                                            }
-                                        } else if (day.toLocalDate().equals(futureReservation.getPickUpDateTime().toLocalDate()) || day.toLocalDate().equals(futureReservation.getDropOffDateTime().toLocalDate())) {
-                                            noConflict = false;
-                                        }
-                                    }
-                                }
+                    if (categoryRequirement == null || categoryRequirement.equals(car.getCarModel().getCategory())) {
+                        if (cmRequirement == null || cmRequirement.equals(car.getCarModel())) {
+                            if (car.getOutlet().equals(outletPickUp)) {
+                                //by default it is available because no reservation assigned as of yet.
+                                allocatedBestCars.add(car);
+                            } else {
+                                allocatedCarsNeedDispatch.add(car);
                             }
                         }
                     }
-                    if (availableCars.get(availableCars.size()-1).equals(car) && bestCarId == 0) {
-                        throw new NoAvailableCarException();
-                    }
                 }
-            } catch (NoAvailableCarException ex) {
-                System.out.println("Something is wrong with EJB Timer Session Bean Java 1");
-            }
-            try {
-                //assign reservation to car vice versa
-                reservationSessionBeanLocal.retrieveReservationByReservationId(reservation.getReservationId()).setCar(carSessionBeanLocal.retrieveCarById(bestCarId));
-                carSessionBeanLocal.retrieveCarById(bestCarId).getReservations().add(reservationSessionBeanLocal.retrieveReservationByReservationId(reservation.getReservationId()));
-                //send the dispatch
-                if(needDispatch) {
-                    //pickup timing
-                    LocalDateTime pickUpDateTimeWithDispatch = reservation.getPickUpDateTime().minusHours(2);
-                    transitDriverDispatchRecordSessionBeanLocal.createNewTransitDriverDispatchRecord(new TransitDriverDispatchRecord(pickUpDateTimeWithDispatch, carSessionBeanLocal.retrieveCarById(bestCarId).getOutlet(), reservation.getPickUpOutlet()));
+                System.out.println(allocatedBestCars.toString());
+                System.out.println(allocatedCarsNeedDispatch.toString());
+                //after looping thorough i check if there is any cars in allocated Best Cars
+                if (!allocatedBestCars.isEmpty()) {
+                    allocatedBestCar.add(allocatedBestCars.get(0));
+                    System.out.println(allocatedBestCar.toString());
+
+                    //time for allocation j change the status to reserved no harm.
+                    allocatedCar = allocatedBestCar.get(0);
+                    
+                    //remove Best car from available car list
+                    availableCars.removeAll(allocatedBestCar);
+                    System.out.println(availableCars.toString());
+                } else if (!allocatedCarsNeedDispatch.isEmpty()) {
+                    allocatedCarNeedDispatch.add(allocatedCarsNeedDispatch.get(0));
+                    System.out.println(allocatedCarNeedDispatch.toString());
+                    
+                    allocatedCar = allocatedCarNeedDispatch.get(0);
+                    
+                    availableCars.removeAll(allocatedCarNeedDispatch);
+                    System.out.println(availableCars.toString());
+                    
+                    //have to create a new transit driver dispatch record
+                    TransitDriverDispatchRecord newTransitDriverDispatchRecord = new TransitDriverDispatchRecord();
+                    newTransitDriverDispatchRecord.setIsCompleted(false);
+                    //already minus 2 hours for the dispatch
+                    newTransitDriverDispatchRecord.setDispatchDate(reservation.getPickUpDateTime().minusHours(2));
+                    newTransitDriverDispatchRecord.setPickUpOutlet(allocatedCar.getOutlet());
+                    newTransitDriverDispatchRecord.setDropOffOutlet(reservation.getPickUpOutlet());
+                    
+                    Long dispatchId = transitDriverDispatchRecordSessionBeanLocal.createNewTransitDriverDispatchRecord(newTransitDriverDispatchRecord);
+                    outletSessionBeanLocal.retrieveOutletById(allocatedCar.getOutlet().getOutletId()).getTransitDriverDispatchRecords().add(transitDriverDispatchRecordSessionBeanLocal.retrieveTransitDriverDispatchRecordById(dispatchId));
+                   
                 } else {
-                    System.out.println("No Dispatch Needed.");
+                    throw new NoAvailableCarException("WE ARE OVER BOOKED SYSTEM IS NOT DOING WELL :(");
                 }
-            } catch (ReservationNotFoundException | CarNotFoundException | UnknownPersistenceException | InputDataValidationException ex) {
-                System.out.println("Something is wrong with EJB Timer Session Bean Java 2");
+                
+                //update the car
+                carSessionBeanLocal.retrieveCarById(allocatedCar.getCarId()).setReservation(reservationSessionBeanLocal.retrieveReservationByReservationId(reservation.getReservationId()));
+                carSessionBeanLocal.retrieveCarById(allocatedCar.getCarId()).setCarStatus(CarStatusEnum.RESERVED);
+                
+                //update the reservation
+                reservationSessionBeanLocal.retrieveReservationByReservationId(reservation.getReservationId()).setCar(carSessionBeanLocal.retrieveCarById(allocatedCar.getCarId()));
+
             }
+        } catch (TransitDriverDispatchRecordNotFoundException | OutletNotFoundException | CarNotFoundException | NoAvailableCarException | ReservationNotFoundException | UnknownPersistenceException | InputDataValidationException ex) {
+            ex.printStackTrace();
         }
+
+        //end
     }
-    
-    
+
     //need something to constantly update the status of cars everyday.
 }

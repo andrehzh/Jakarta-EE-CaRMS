@@ -57,7 +57,7 @@ public class Reservation implements Serializable {
     @OneToMany
     private List<RentalRate> rentalRates;
 
-    @ManyToOne
+    @OneToOne
     private Car car;
 
     @ManyToOne

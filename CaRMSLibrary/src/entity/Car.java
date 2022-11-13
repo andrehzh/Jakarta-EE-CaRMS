@@ -7,8 +7,6 @@ package entity;
 
 import util.enumeration.CarStatusEnum;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 //really double checking
@@ -52,17 +50,14 @@ public class Car implements Serializable {
     @JoinColumn(nullable = true)
     private Outlet outlet;
     
-    @OneToMany(mappedBy = "car")
-    private List<Reservation> reservations;
-    
+    @OneToOne(mappedBy = "car")
+    private Reservation reservation;
     
 
     public Car() {
-        reservations = new ArrayList<>();
     }
 
     public Car(String carPlateNumber, String carColor, CarStatusEnum carStatus) {
-        this();
         
         this.carPlateNumber = carPlateNumber;
         this.carColor = carColor;
@@ -90,17 +85,17 @@ public class Car implements Serializable {
     }
 
     /**
-     * @return the reservations
+     * @return the reservation
      */
-    public List<Reservation> getReservations() {
-        return reservations;
+    public Reservation getReservation() {
+        return reservation;
     }
 
     /**
-     * @param reservations the reservations to set
+     * @param reservation the reservation to set
      */
-    public void setReservations(List<Reservation> reservations) {
-        this.reservations = reservations;
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
     /**

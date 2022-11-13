@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Category;
 import entity.RentalRate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,4 +36,6 @@ public interface RentalRateSessionBeanRemote {
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException;
 
     public RentalRate retrieveRentalRateByRentalRateName(String rentalRateName) throws RentalRateNotFoundException;
+    
+    public List<RentalRate> retrieveRentalRatesByCategory(Category category) throws RentalRateNotFoundException;
 }

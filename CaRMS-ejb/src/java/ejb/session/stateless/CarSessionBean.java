@@ -107,6 +107,8 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                 if (carToUpdate.getCarPlateNumber().equals(car.getCarPlateNumber())) {
                     carToUpdate.setCarColor(car.getCarColor());
                     carToUpdate.setCarStatus(car.getCarStatus());
+                    carToUpdate.setReservation(car.getReservation());
+                    carToUpdate.setOutlet(car.getOutlet());
                 } else {
                     throw new UpdateCarException("UpdateCarException");
                 }
@@ -121,7 +123,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException {
         Car carToRemove = retrieveCarById(carId);
-        if (carToRemove.getReservations().isEmpty()) {
+        if (carToRemove.getReservation() == null) {
             throw new DeleteCarException("Car " + carId.toString() + " is associated with an existing reservation and cannot be deleted!");
         } else {
             em.remove(carToRemove);

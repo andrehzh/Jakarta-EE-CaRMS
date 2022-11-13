@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Category;
 import entity.RentalRate;
 import java.time.LocalDateTime;
 
@@ -100,18 +101,30 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             throw new RentalRateNotFoundException("Rental Rate date: " + date + " does not exist!");
         }
     }
-    
+
+    @Override
+    public List<RentalRate> retrieveRentalRatesByCategory(Category category) throws RentalRateNotFoundException {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.carCategory = :inCarCategory");
+        query.setParameter("inCarCategory", category);
+
+        try {
+            return query.getResultList();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new RentalRateNotFoundException("Rental Rate with category: " + category + " does not exist!");
+        }
+    }
+
     @Override
     public RentalRate retrieveRentalRateByRentalRateName(String rentalRateName) throws RentalRateNotFoundException {
         try {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.rentalRateName = :inRentalRateName");
-        query.setParameter("inRentalRateName", rentalRateName);
-        
-        return (RentalRate) query.getSingleResult(); 
+            Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.rentalRateName = :inRentalRateName");
+            query.setParameter("inRentalRateName", rentalRateName);
+
+            return (RentalRate) query.getSingleResult();
         } catch (PersistenceException ex) {
             throw new RentalRateNotFoundException();
         }
-        
+
     }
 
     @Override
