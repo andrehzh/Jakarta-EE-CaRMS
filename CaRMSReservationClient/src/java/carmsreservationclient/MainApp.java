@@ -202,7 +202,7 @@ public class MainApp {
             } catch (CustomerEmailExistException ex) {
                 System.out.println("An error has occurred while creating the new Customer!: The customer email already exist\n");
             } catch (UnknownPersistenceException ex) {
-                System.out.println("An unknown error has occurred while creating the new staff!: " + ex.getMessage() + "\n");
+                System.out.println("An unknown error has occurred while creating the new Customer!: " + ex.getMessage() + "\n");
             } catch (InputDataValidationException ex) {
                 System.out.println(ex.getMessage() + "\n");
             }

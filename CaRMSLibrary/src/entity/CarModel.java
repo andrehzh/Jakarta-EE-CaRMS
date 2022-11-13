@@ -43,6 +43,8 @@ public class CarModel implements Serializable {
     @JoinColumn(nullable = false)
     private Category category;
     
+    private boolean isDisabled = false;
+    
 //theres no need to track the num of cars
     
 //    @OneToMany(mappedBy = "carModel")
@@ -135,6 +137,20 @@ public class CarModel implements Serializable {
      */
     public void setCarModelName(String carModelName) {
         this.carModelName = carModelName;
+    }
+
+    /**
+     * @return the isDisabled
+     */
+    public boolean isIsDisabled() {
+        return isDisabled;
+    }
+
+    /**
+     * @param isDisabled the isDisabled to set
+     */
+    public void setIsDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 
 }

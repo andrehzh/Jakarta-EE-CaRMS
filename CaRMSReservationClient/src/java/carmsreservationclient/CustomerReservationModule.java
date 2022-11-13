@@ -103,7 +103,7 @@ public class CustomerReservationModule {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** Here are your reservations! ***\n");
         try {
-            List<Reservation> allReservations = reservationSessionBeanRemote.retrieveReservationByCustomerId(currentOwnCustomer.getCustomerId());
+            List<Reservation> allReservations = reservationSessionBeanRemote.retrieveReservationsByCustomerId(currentOwnCustomer.getCustomerId());
             int i = 1;
             for (Reservation reservation : allReservations) {
                 System.out.println(i + ": " + reservation.getReservationNumber());

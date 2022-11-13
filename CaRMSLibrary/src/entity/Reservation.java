@@ -22,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.ReservationPickupStatusEnum;
 
 /**
  *
@@ -44,6 +45,9 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     @NotNull
     private LocalDateTime dropOffDateTime;
+    @Column(nullable = false)
+    @NotNull
+    private ReservationPickupStatusEnum reservationPickupStatus;
 
     @ManyToOne(cascade=CascadeType.ALL)
     private Partner partner;
@@ -77,6 +81,7 @@ public class Reservation implements Serializable {
     public Reservation() {
 
         rentalRates = new ArrayList<>();
+        reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
     }
 
     public Reservation(String reservationNumber, LocalDateTime pickUpDateTime, LocalDateTime dropOffDateTime) {
@@ -85,18 +90,18 @@ public class Reservation implements Serializable {
         this.reservationNumber = reservationNumber;
         this.pickUpDateTime = pickUpDateTime;
         this.dropOffDateTime = dropOffDateTime;
+        this.reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
     }
 
     public Reservation(String reservationNumber, LocalDateTime pickUpDateTime, LocalDateTime dropOffDateTime, Outlet pickUpOutlet, Outlet dropOffOutlet) {
-        this(); 
+        this();
         this.reservationNumber = reservationNumber;
         this.pickUpDateTime = pickUpDateTime;
         this.dropOffDateTime = dropOffDateTime;
         this.pickUpOutlet = pickUpOutlet;
         this.dropOffOutlet = dropOffOutlet;
+        this.reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
     }
-    
-    
 
     public Long getReservationId() {
         return reservationId;
@@ -297,6 +302,20 @@ public class Reservation implements Serializable {
     @Override
     public String toString() {
         return "entity.Reservation[ id=" + reservationId + " ]";
+    }
+
+    /**
+     * @return the reservationPickupStatus
+     */
+    public ReservationPickupStatusEnum getReservationPickupStatus() {
+        return reservationPickupStatus;
+    }
+
+    /**
+     * @param reservationPickupStatus the reservationPickupStatus to set
+     */
+    public void setReservationPickupStatus(ReservationPickupStatusEnum reservationPickupStatus) {
+        this.reservationPickupStatus = reservationPickupStatus;
     }
 
 }

@@ -79,7 +79,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public List<Car> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM Car c");
+        Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.carModel.category.categoryName, c.carModel.carModelBrand, c.carModel.carModelName, c.carPlateNumber");
 
         return query.getResultList();
     }
@@ -123,8 +123,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException {
         Car carToRemove = retrieveCarById(carId);
+
         if (carToRemove.getReservation() == null) {
-            throw new DeleteCarException("Car " + carId.toString() + " is associated with an existing reservation and cannot be deleted!");
+            carToRemove.setIsDisabled(true);
+            throw new DeleteCarException("Car " + carId.toString() + " is associated with an existing reservation and cannot be deleted! It has been disabled and cannot be rented out.");
+
         } else {
             em.remove(carToRemove);
         }

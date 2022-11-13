@@ -35,7 +35,7 @@ public interface ReservationSessionBeanRemote {
     public Reservation retrieveReservationByReservationNumber(String reservationNumber) throws ReservationNotFoundException;
     
     
-    public  List<Reservation> retrieveReservationByCustomerId(Long customerId) throws ReservationNotFoundException;
+    public  List<Reservation> retrieveReservationsByCustomerId(Long customerId) throws ReservationNotFoundException;
     
     public void updateReservationCustomer(Reservation reservation) throws ReservationNotFoundException, UpdateReservationException, InputDataValidationException;
 

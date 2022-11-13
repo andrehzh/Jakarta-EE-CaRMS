@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,22 +59,25 @@ public class RentalRate implements Serializable {
     private BigDecimal rentalAmount;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
+    private boolean isDisabled;
+//    private Duration validityPeriod;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Category carCategory;
 
     public RentalRate() {
+        this.isDisabled = false;
     }
 
-    public RentalRate(String rentalRateName, String rentalRateType, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        this.rentalRateName = rentalRateName;
-        this.rentalRateType = rentalRateType;
-        this.rentalAmount = rentalAmount;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-    }
-
+//    public RentalRate(String rentalRateName, String rentalRateType, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+//        this.rentalRateName = rentalRateName;
+//        this.rentalRateType = rentalRateType;
+//        this.rentalAmount = rentalAmount;
+//        this.startDateTime = startDateTime;
+//        this.endDateTime = endDateTime;
+//        this.isDisabled = false;
+//    }
     public RentalRate(String rentalRateName, String rentalCarCategory, BigDecimal rentalAmount, LocalDateTime startDateTime, LocalDateTime endDateTime, Category category) {
         this.rentalRateName = rentalRateName;
         this.rentalRateType = rentalCarCategory;
@@ -81,9 +85,8 @@ public class RentalRate implements Serializable {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.carCategory = category;
+        this.isDisabled = false;
     }
-    
-    
 
     public Long getRentalRateId() {
         return rentalRateId;
@@ -186,6 +189,20 @@ public class RentalRate implements Serializable {
     @Override
     public String toString() {
         return "entity.RentalRate[ id=" + rentalRateId + " ]";
+    }
+
+    /**
+     * @return the isDisabled
+     */
+    public boolean isIsDisabled() {
+        return isDisabled;
+    }
+
+    /**
+     * @param isDisabled the isDisabled to set
+     */
+    public void setIsDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 
 }

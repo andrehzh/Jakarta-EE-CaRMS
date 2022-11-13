@@ -78,16 +78,16 @@ public class OpsManagementModule {
                 System.out.println("1: Create New Car Model");
                 System.out.println("2: View All Car Models");
                 System.out.println("3: Update Car Model");
-                System.out.println("--------------------------");
                 System.out.println("4: Delete Car Model");
+                System.out.println("--------------------------");
                 System.out.println("5: Create New Car");
                 System.out.println("6: View All Cars");
-                System.out.println("--------------------------");
                 System.out.println("7: View Car Details");
+                System.out.println("--------------------------");
                 System.out.println("8: View Transit Driver Dispatch Records for Current Day Reservations");
                 System.out.println("9: Assign Transit Driver");
-                System.out.println("--------------------------");
                 System.out.println("10: Update Transit As Completed");
+                System.out.println("--------------------------");
                 System.out.println("11: Back\n");
                 response = 0;
 
@@ -105,11 +105,11 @@ public class OpsManagementModule {
                     } else if (response == 4) {
                         doDeleteCarModel();
                     } else if (response == 5) {
-                        System.out.println("doCreateNewCar()");
+                        doCreateNewCar();
                     } else if (response == 6) {
-                        System.out.println("doViewAllCars()");
+                        doViewAllCars();
                     } else if (response == 7) {
-                        System.out.println("doViewCarDetails()");
+                        doViewCarDetails();
                     } else if (response == 8) {
                         System.out.println("doViewTransitDriverDispatchRecords()");
                     } else if (response == 9) {
@@ -174,13 +174,13 @@ public class OpsManagementModule {
         System.out.println("*** CaRMS Management Client :: Operations Management :: View All Car Models ***\n");
 
         List<CarModel> CarModels = carModelSessionBeanRemote.retrieveAllCarModels();
-        System.out.printf("%8s%20s%10s%20s\n", "Car Model ID", "Make", "Model", "Category");
+        System.out.printf("%20s%20s%20s%20s\n", "Car Model ID", "Make", "Model", "Category");
 
         for (CarModel carModel : CarModels) {
-            System.out.printf("%8s%20s%10s%20s\n", carModel.getCarModelId().toString(), carModel.getCarModelBrand(), carModel.getCarModelName(), carModel.getCategory().getCategoryName());
+            System.out.printf("%20s%20s%20s%20s\n", carModel.getCarModelId().toString(), carModel.getCarModelBrand(), carModel.getCarModelName(), carModel.getCategory().getCategoryName());
         }
 
-        System.out.print("Press any key to continue...> ");
+        System.out.print("Press ENTER to continue...> ");
         scanner.nextLine();
     }
 
@@ -196,7 +196,7 @@ public class OpsManagementModule {
             carModel = carModelSessionBeanRemote.retrieveCarModelById(scanner.nextLong());
 
             System.out.print("Enter Car Make (blank if no change)> ");
-            input = scanner.nextLine().trim();
+            input = scanner.next().trim();
             if (input.length() > 0) {
                 carModel.setCarModelBrand(input);
             }
@@ -215,6 +215,7 @@ public class OpsManagementModule {
                     carModel.setCategory(cat);
                 } catch (CategoryNotFoundException ex) {
                     System.out.println("Could not find Category!");
+                    return;
                 }
             }
             Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
@@ -225,8 +226,10 @@ public class OpsManagementModule {
                     System.out.println("Car Model updated successfully!\n");
                 } catch (CarModelNotFoundException | UpdateCarModelException ex) {
                     System.out.println("An error has occurred while updating Car Model: " + ex.getMessage() + "\n");
+                    return;
                 } catch (InputDataValidationException ex) {
                     System.out.println(ex.getMessage() + "\n");
+                    return;
                 }
             } else {
                 showInputDataValidationErrorsForCarModel(constraintViolations);
@@ -248,14 +251,17 @@ public class OpsManagementModule {
             carModel = carModelSessionBeanRemote.retrieveCarModelById(scanner.nextLong());
 
             System.out.printf("Confirm Delete Car Model %s %s (Enter 'Y' to Delete)> ", carModel.getCarModelBrand(), carModel.getCarModelName());
-            input = scanner.nextLine().trim();
+            input = scanner.next().trim();
 
-            if (input.equals("Y")) {
+            if (input.equals("Y") || input.equals("y")) {
                 try {
                     carModelSessionBeanRemote.deleteCarModel(carModel.getCarModelId());
                     System.out.println("Car Model deleted successfully!\n");
-                } catch (CarModelNotFoundException | DeleteCarModelException ex) {
+                } catch (CarModelNotFoundException ex) {
                     System.out.println("An error has occurred while deleting Car Model: " + ex.getMessage() + "\n");
+                } catch (DeleteCarModelException ex) {
+                    System.out.println("Car Model is in use!\n");
+                    System.out.println("Car Model has been marked as disabled.\n");
                 }
             } else {
                 System.out.println("CarModel NOT deleted!\n");
@@ -280,6 +286,11 @@ public class OpsManagementModule {
 
         try {
             carModel = carModelSessionBeanRemote.retrieveCarModelByBrandAndName(modelBrand, modelName);
+            if (carModel.isIsDisabled()) {
+                System.out.println("Car Model " + carModel.getCarModelBrand() + " " + carModel.getCarModelName() + " is disabled!");
+                return;
+            }
+
             newCar.setCarModel(carModel);
             System.out.print("Enter License Plate Number> ");
             newCar.setCarPlateNumber(scanner.nextLine().trim());
@@ -337,13 +348,13 @@ public class OpsManagementModule {
         System.out.println("*** CaRMS Management Client :: Sales Management :: View All Cars ***\n");
 
         List<Car> Cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%8s%20s%10s%20s%10s\n", "Car ID", "Category", "Make", "Model", "License Plate");
+        System.out.printf("%20s%20s%20s%20s%20s\n", "Car ID", "Category", "Make", "Model", "License Plate");
 
         for (Car car : Cars) {
-            System.out.printf("%8s%20s%10s%20s%10s\n", car.getCarId().toString(), car.getCarModel().getCategory().getCategoryName(), car.getCarModel().getCarModelBrand(), car.getCarModel().getCarModelName(), car.getCarPlateNumber());
+            System.out.printf("%20s%20s%20s%20s%20s\n", car.getCarId().toString(), car.getCarModel().getCategory().getCategoryName(), car.getCarModel().getCarModelBrand(), car.getCarModel().getCarModelName(), car.getCarPlateNumber());
         }
 
-        System.out.print("Press any key to continue...> ");
+        System.out.print("Press ENTER to continue...> ");
         scanner.nextLine();
     }
 
@@ -357,8 +368,8 @@ public class OpsManagementModule {
 
         try {
             Car car = carSessionBeanRemote.retrieveCarByCarPlate(cp);
-            System.out.printf("%8s%20s%10s%20s%10s\n", "Car ID", "Category", "Make", "Model", "License Plate");
-            System.out.printf("%8s%20s%10s%20s%10s\n", car.getCarId().toString(), car.getCarModel().getCategory().getCategoryName(), car.getCarModel().getCarModelBrand(), car.getCarModel().getCarModelName(), car.getCarPlateNumber());
+            System.out.printf("%20s%20s%20s%20s%20s\n", "Car ID", "Category", "Make", "Model", "License Plate");
+            System.out.printf("%20s%20s%20s%20s%20s\n", car.getCarId().toString(), car.getCarModel().getCategory().getCategoryName(), car.getCarModel().getCarModelBrand(), car.getCarModel().getCarModelName(), car.getCarPlateNumber());
             System.out.println("------------------------");
             System.out.println("1: Update Car");
             System.out.println("2: Delete Car");
@@ -466,12 +477,15 @@ public class OpsManagementModule {
         System.out.printf("Confirm Delete %s %s %s (Enter 'Y' to Delete)> ", car.getCarModel().getCarModelBrand(), car.getCarModel().getCarModelName(), car.getCarPlateNumber());
         input = scanner.nextLine().trim();
 
-        if (input.equals("Y")) {
+        if (input.equals("Y") || input.equals("y")) {
             try {
                 carSessionBeanRemote.deleteCar(car.getCarId());
                 System.out.println("Car deleted successfully!\n");
-            } catch (CarNotFoundException | DeleteCarException ex) {
+            } catch (CarNotFoundException ex) {
                 System.out.println("An error has occurred while deleting Car: " + ex.getMessage() + "\n");
+            } catch (DeleteCarException ex) {
+                System.out.println("Car is in use!\n");
+                System.out.println("Car has been marked as disabled and cannot be rented out.\n");
             }
         } else {
             System.out.println("Car NOT deleted!\n");

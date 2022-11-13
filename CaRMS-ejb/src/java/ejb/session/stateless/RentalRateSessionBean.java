@@ -73,7 +73,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @Override
     public List<RentalRate> retrieveAllRentalRates() {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.startDateTime ASC");
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory.categoryName, rr.startDateTime, rr.endDateTime  ASC");
 
         return query.getResultList();
     }
@@ -161,6 +161,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             //no need to remove from category cause em will do it
             em.remove(rentalRateToRemove);
         } catch (PersistenceException ex) {
+            rentalRateToRemove.setIsDisabled(true);
             throw new DeleteRentalRateException();
         }
 

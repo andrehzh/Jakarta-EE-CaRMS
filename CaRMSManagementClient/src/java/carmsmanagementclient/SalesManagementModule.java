@@ -13,6 +13,7 @@ import entity.Category;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class SalesManagementModule {
         minute = scanner.nextInt();
 
         newRentalRate.setEndDateTime(LocalDateTime.of(year, month, day, hour, minute));
-        System.out.println("The rental rate END date is: " + newRentalRate.getStartDateTime().toString() + "\n");
+        System.out.println("The rental rate END date is: " + newRentalRate.getEndDateTime().toString() + "\n");
 
         Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(newRentalRate);
 
@@ -173,13 +174,28 @@ public class SalesManagementModule {
         System.out.println("*** CaRMS Management Client :: Sales Management :: View All Rental Rates ***\n");
 
         List<RentalRate> RentalRates = rentalRateSessionBeanRemote.retrieveAllRentalRates();
-        System.out.printf("%8s%20s%10s%20s%10s%20s%20s\n", "Rental Rate ID", "Name", "Type", "Category", "Daily Rate", "Validity Start Date", "Validity End Date");
+        System.out.printf("%20s%20s%20s%20s%20s%20s%20s\n", "Rental Rate ID", "Name", "Type", "Category", "Daily Rate", "Validity Start Date", "Validity End Date");
 
         for (RentalRate rentalRate : RentalRates) {
-            System.out.printf("%8s%20s%10s%20s%10s%20s%20s\n", rentalRate.getRentalRateId().toString(), rentalRate.getRentalRateName(), rentalRate.getRentalRateType(), rentalRate.getCarCategory(), rentalRate.getRentalAmount().toString(), rentalRate.getStartDateTime().toString(), rentalRate.getEndDateTime().toString());
+            String n = "-";
+            String startDate;
+            String endDate;
+
+            if (rentalRate.getStartDateTime() == null) {
+                startDate = n;
+            } else {
+                startDate = rentalRate.getStartDateTime().toString();
+            }
+            if (rentalRate.getEndDateTime() == null) {
+                endDate = n;
+            } else {
+                endDate = rentalRate.getEndDateTime().toString();
+            }
+
+            System.out.printf("%20s%20s%20s%20s%20s%20s%20s\n", rentalRate.getRentalRateId().toString(), rentalRate.getRentalRateName(), rentalRate.getRentalRateType(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRentalAmount().toString(), startDate, endDate);
         }
 
-        System.out.print("Press any key to continue...> ");
+        System.out.print("Press ENTER to continue...> ");
         scanner.nextLine();
     }
 
@@ -189,27 +205,45 @@ public class SalesManagementModule {
 
         System.out.println("*** CaRMS Management Client :: Sales Management :: View Rental Rate Details ***\n");
         System.out.print("Enter Rental Rate ID> ");
-        Long rrID = scanner.nextLong();
-
         try {
-            RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRateByRentalRateId(rrID);
-            System.out.printf("%8s%20s%10s%20s%10s%20s%20s\n", "Rental Rate ID", "Name", "Type", "Category", "Daily Rate", "Validity Start Date", "Validity End Date");
-            System.out.printf("%8s%20s%10s%20s%10s%20s%20s\n", rentalRate.getRentalRateId().toString(), rentalRate.getRentalRateName(), rentalRate.getRentalRateType(), rentalRate.getCarCategory(), rentalRate.getRentalAmount().toString(), rentalRate.getStartDateTime().toString(), rentalRate.getEndDateTime().toString());
-            System.out.println("------------------------");
-            System.out.println("1: Update Rental Rate");
-            System.out.println("2: Delete Rental Rate");
-            System.out.println("3: Back\n");
-            System.out.print("> ");
-            response = scanner.nextInt();
+            Long rrID = scanner.nextLong();
+            try {
+                RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRateByRentalRateId(rrID);
+                String n = "-";
+                String startDate;
+                String endDate;
 
-            if (response == 1) {
-                doUpdateRentalRate(rentalRate);
-            } else if (response == 2) {
-                doDeleteRentalRate(rentalRate);
+                if (rentalRate.getStartDateTime() == null) {
+                    startDate = n;
+                } else {
+                    startDate = rentalRate.getStartDateTime().toString();
+                }
+                if (rentalRate.getEndDateTime() == null) {
+                    endDate = n;
+                } else {
+                    endDate = rentalRate.getEndDateTime().toString();
+                }
+                System.out.printf("%20s%20s%20s%20s%20s%20s%20s\n", "Rental Rate ID", "Name", "Type", "Category", "Daily Rate", "Validity Start Date", "Validity End Date");
+                System.out.printf("%20s%20s%20s%20s%20s%20s%20s\n", rentalRate.getRentalRateId().toString(), rentalRate.getRentalRateName(), rentalRate.getRentalRateType(), rentalRate.getCarCategory().getCategoryName(), rentalRate.getRentalAmount().toString(), startDate, endDate);
+                System.out.println("------------------------");
+                System.out.println("1: Update Rental Rate");
+                System.out.println("2: Delete Rental Rate");
+                System.out.println("3: Back\n");
+                System.out.print("> ");
+                response = scanner.nextInt();
+
+                if (response == 1) {
+                    doUpdateRentalRate(rentalRate);
+                } else if (response == 2) {
+                    doDeleteRentalRate(rentalRate);
+                }
+            } catch (RentalRateNotFoundException ex) {
+                System.out.println("An error has occurred while retrieving Rental Rate: " + ex.getMessage() + "\n");
             }
-        } catch (RentalRateNotFoundException ex) {
-            System.out.println("An error has occurred while retrieving Rental Rate: " + ex.getMessage() + "\n");
+        } catch (InputMismatchException ex) {
+            System.out.println("Input not valid!");
         }
+
     }
 
     private void doUpdateRentalRate(RentalRate rentalRate) {
@@ -248,18 +282,48 @@ public class SalesManagementModule {
             rentalRate.setRentalAmount(bigDecimalInput);
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        int hour = 0;
+        int minute = 0;
 
-        System.out.print("Enter Validity Start Date (DDMMYY) (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if (input.length() > 0) {
-            rentalRate.setStartDateTime(LocalDateTime.parse(input, formatter));
+        System.out.print("Change Validity Start Date? (Enter Y to edit or leave blank if no change)> ");
+        input = scanner.next().trim();
+        if (input.equals("y") || input.equals("Y")) {
+            System.out.println("*** Please enter the Validity Start Details Accordingly ***");
+            System.out.print("Enter Year(2022)> ");
+            year = scanner.nextInt();
+            System.out.print("Enter Month(12)> ");
+            month = scanner.nextInt();
+            System.out.print("Enter Day(15)> ");
+            day = scanner.nextInt();
+            System.out.print("Enter Hour(22)> ");
+            hour = scanner.nextInt();
+            System.out.print("Enter Minute(15)> ");
+            minute = scanner.nextInt();
+
+            rentalRate.setStartDateTime(LocalDateTime.of(year, month, day, hour, minute));
+            System.out.println("The new rental rate START date is: " + rentalRate.getStartDateTime().toString() + "\n");
         }
 
-        System.out.print("Enter Validity End Date (DDMMYY) (blank if no change)> ");
+        System.out.print("Change Validity End Date? (Enter Y to edit or leave blank if no change)> ");
         input = scanner.nextLine().trim();
-        if (input.length() > 0) {
-            rentalRate.setEndDateTime(LocalDateTime.parse(input, formatter));
+        if (input.equals("y") || input.equals("Y")) {
+            System.out.println("*** Please enter the Validity End Details Accordingly ***");
+            System.out.print("Enter Year(2022)> ");
+            year = scanner.nextInt();
+            System.out.print("Enter Month(12)> ");
+            month = scanner.nextInt();
+            System.out.print("Enter Day(15)> ");
+            day = scanner.nextInt();
+            System.out.print("Enter Hour(22)> ");
+            hour = scanner.nextInt();
+            System.out.print("Enter Minute(15)> ");
+            minute = scanner.nextInt();
+
+            rentalRate.setEndDateTime(LocalDateTime.of(year, month, day, hour, minute));
+            System.out.println("The new rental rate END date is: " + rentalRate.getEndDateTime().toString() + "\n");
         }
 
         Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
@@ -286,12 +350,15 @@ public class SalesManagementModule {
         System.out.printf("Confirm Delete Rental Rate %s (Type: %s) (Enter 'Y' to Delete)> ", rentalRate.getRentalRateName(), rentalRate.getRentalRateType());
         input = scanner.nextLine().trim();
 
-        if (input.equals("Y")) {
+        if (input.equals("y") || input.equals("Y")) {
             try {
                 rentalRateSessionBeanRemote.deleteRentalRate(rentalRate.getRentalRateId());
                 System.out.println("Rental Rate deleted successfully!\n");
-            } catch (RentalRateNotFoundException | DeleteRentalRateException ex) {
-                System.out.println("An error has occurred while deleting Rental Rate: " + ex.getMessage() + "\n");
+            } catch (RentalRateNotFoundException ex) {
+                System.out.println("Rental Rate is not found!\n");
+            } catch (DeleteRentalRateException ex) {
+                System.out.println("Rental Rate is in use!\n");
+                System.out.println("Rental Rate has been marked as disabled.\n");
             }
         } else {
             System.out.println("RentalRate NOT deleted!\n");
