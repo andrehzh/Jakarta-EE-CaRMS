@@ -557,6 +557,7 @@ public class MainApp {
                                     System.out.println("Invalid option, please try again!\n");
                                 }
                             }
+                            searchReservation.setCategory(selectedCar.getCarModel().getCategory());
                             doMakeReservation(searchReservation, getReservationPrice(selectedCar.getCarModel().getCategory(), searchReservation));
                             //need to make the new reservation here.
                         } else {

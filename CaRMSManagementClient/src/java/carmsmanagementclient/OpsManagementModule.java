@@ -318,7 +318,7 @@ public class OpsManagementModule {
                 if (response == 1) {
                     newCar.setCarStatus(CarStatusEnum.AVAILABLE);
                     System.out.println("Enter Outlet Name>");
-                    String o = scanner.next();
+                    String o = scanner.nextLine();
                     try {
                         outlet = outletSessionBeanRemote.retrieveOutletByOutletName(o);
                         newCar.setOutlet(outlet);
@@ -455,7 +455,7 @@ public class OpsManagementModule {
                 if (response == 1) {
                     car.setCarStatus(CarStatusEnum.AVAILABLE);
                     System.out.println("Enter Outlet Name>");
-                    String o = scanner.next();
+                    String o = scanner.nextLine();
                     try {
                         outlet = outletSessionBeanRemote.retrieveOutletByOutletName(o);
                         car.setOutlet(outlet);
