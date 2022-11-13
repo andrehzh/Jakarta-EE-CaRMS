@@ -9,11 +9,13 @@ import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import entity.Car;
 import entity.Category;
 import entity.Employee;
 import entity.CarModel;
+import entity.Outlet;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
@@ -33,6 +35,7 @@ import util.exception.DeleteCarException;
 import util.exception.DeleteCarModelException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCarException;
 import util.exception.UpdateCarModelException;
@@ -52,13 +55,14 @@ public class OpsManagementModule {
     private Employee currentEmployee;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private CategorySessionBeanRemote categorySessionBeanRemote;
+    private OutletSessionBeanRemote outletSessionBeanRemote;
 
     public OpsManagementModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OpsManagementModule(CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, Employee currentEmployee, EmployeeSessionBeanRemote employeeSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote) {
+    public OpsManagementModule(CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, Employee currentEmployee, EmployeeSessionBeanRemote employeeSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
         this();
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
@@ -66,6 +70,7 @@ public class OpsManagementModule {
         this.currentEmployee = currentEmployee;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.categorySessionBeanRemote = categorySessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
     }
 
     public void menuOpsManagement() throws InvalidAccessRightException {
@@ -277,6 +282,7 @@ public class OpsManagementModule {
         String modelBrand;
         String modelName;
         CarModel carModel;
+        Outlet outlet = new Outlet();
 
         System.out.println("*** CaRMS Management Client :: Sales Management :: Create New Car ***\n");
         System.out.print("Enter Car Make> ");
@@ -309,7 +315,15 @@ public class OpsManagementModule {
 
                 if (response == 1) {
                     newCar.setCarStatus(CarStatusEnum.AVAILABLE);
-                    System.out.println("Enter Outlet> TODO");
+                    System.out.println("Enter Outlet Name>");
+                    String o = scanner.next();
+                    try {
+                        outlet = outletSessionBeanRemote.retrieveOutletByOutletName(o);
+                        newCar.setOutlet(outlet);
+                    } catch (OutletNotFoundException ex) {
+                        System.out.println("Outlet not found!");
+                        return;
+                    }
                 } else if (response == 2) {
                     newCar.setCarStatus(CarStatusEnum.RESERVED);
                     System.out.println("Enter Rental Customer> TODO");
@@ -392,6 +406,7 @@ public class OpsManagementModule {
         String input;
         Integer integerInput;
         BigDecimal bigDecimalInput;
+        Outlet outlet = new Outlet();
 
         System.out.println("*** CaRMS Management Client :: Sales Management :: View Car Details :: Update Car ***\n");
 
@@ -437,7 +452,15 @@ public class OpsManagementModule {
 
                 if (response == 1) {
                     car.setCarStatus(CarStatusEnum.AVAILABLE);
-                    System.out.println("Enter Outlet> TODO");
+                    System.out.println("Enter Outlet Name>");
+                    String o = scanner.next();
+                    try {
+                        outlet = outletSessionBeanRemote.retrieveOutletByOutletName(o);
+                        car.setOutlet(outlet);
+                    } catch (OutletNotFoundException ex) {
+                        System.out.println("Outlet not found!");
+                        return;
+                    }
                 } else if (response == 2) {
                     car.setCarStatus(CarStatusEnum.RESERVED);
                     System.out.println("Enter Rental Customer> TODO");
