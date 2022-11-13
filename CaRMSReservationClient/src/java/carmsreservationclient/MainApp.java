@@ -35,7 +35,9 @@ import javax.validation.ValidatorFactory;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.TransactionStatusEnum;
 import util.exception.CardNumberExistException;
+import util.exception.CreditCardNotFoundException;
 import util.exception.CustomerEmailExistException;
+import util.exception.CustomerNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
@@ -116,13 +118,15 @@ public class MainApp {
                     try {
                         doCustomerLogin();
                         System.out.println("*** Successfull Logged In! ***\n");
-                    } catch (InvalidLoginCredentialException ex) {
+                        System.out.print(customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard() == null);
+
+                    } catch (CustomerNotFoundException | InvalidLoginCredentialException ex) {
                         ex.printStackTrace();
                     }
                 } else if (response == 2) {
                     doRegisterNewCustomer();
                 } else if (response == 3) {
-                    doSearchCar();
+                    doRecordCreditCardInformation();
                 } else if (response == 4) {
                     if (currentOwnCustomer != null) {
                         customerReservationModule = new CustomerReservationModule(rentalRateSessionBeanRemote, reservationTransactionSessionBeanRemote, outletSessionBeanRemote, reservationSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, partnerSessionBeanRemote, creditCardSessionBeanRemote, customerSessionBeanRemote, customerReservationModule, currentOwnCustomer);
@@ -542,16 +546,16 @@ public class MainApp {
 
                                 response = scanner.nextInt();
 
-                                if (response > 0 && response < catRef - 1) {
+                                if (response > 0 && response < catRef) {
                                     selectedCar = suitableCars.get(response - 1);
                                     System.out.println("You have selected Car: " + selectedCar.getCarModel().getCarModelName() + "!\n");
                                     System.out.println("With Reservation Details: " + searchReservation.getPickUpDateTime() + " TO " + searchReservation.getDropOffDateTime());
-                                    doMakeReservation(searchReservation, getReservationPrice(selectedCar.getCarModel().getCategory(), searchReservation));
+                                    break;
                                 } else {
                                     System.out.println("Invalid option, please try again!\n");
                                 }
                             }
-
+                            doMakeReservation(searchReservation, getReservationPrice(selectedCar.getCarModel().getCategory(), searchReservation));
                             //need to make the new reservation here.
                         } else {
                             throw new InvalidLoginCredentialException("You are not Logged In!");
@@ -621,45 +625,46 @@ public class MainApp {
     }
 
     private void doMakeReservation(Reservation reservation, BigDecimal transactionAmount) {
-        Scanner scanner = new Scanner(System.in);
-        if (currentOwnCustomer.getCreditCard() == null) {
-            doRecordCreditCardInformation();
-        }
-        CreditCard customerCard = currentOwnCustomer.getCreditCard();
-        System.out.println("You will use CreditCard: " + customerCard.getCardNumber());
-        System.out.println("*** Please select a payment option! ***\n");
-        System.out.println("1: Immediate Rental Fee Payment");
-        System.out.println("2: Deferred Rental Fee Payment");
-        int response = 0;
-        
-        ReservationTransaction newReservationTransaction = new ReservationTransaction();
-        newReservationTransaction.setTransactionDate(LocalDateTime.now());
-        newReservationTransaction.setTransactionAmount(transactionAmount);
-
-        while (response < 1 || response > 2) {
-            System.out.print("> ");
-
-            response = scanner.nextInt();
-
-            if (response == 1) {
-                System.out.println("You have selected Immediate Payment!");
-                newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAID);
-            } else if (response == 2) {
-                System.out.println("You have selected Deferred Payment!");
-                newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAY_ON_SITE);
-            } else {
-                System.out.println("Invalid option, please try again!\n");
-            }
-        }
-        
         try {
+            Scanner scanner = new Scanner(System.in);
+            if (customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard() == null) {
+                doRecordCreditCardInformation();
+            }
+            CreditCard customerCard = customerSessionBeanRemote.retrieveCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard();
+            System.out.println("You will use CreditCard: " + customerCard.getCardNumber());
+            System.out.println("*** Please select a payment option! ***\n");
+            System.out.println("1: Immediate Rental Fee Payment");
+            System.out.println("2: Deferred Rental Fee Payment");
+            int response = 0;
+
+            ReservationTransaction newReservationTransaction = new ReservationTransaction();
+            newReservationTransaction.setTransactionDate(LocalDateTime.now());
+            newReservationTransaction.setTransactionAmount(transactionAmount);
+
+            while (response < 1 || response > 2) {
+                System.out.print("> ");
+
+                response = scanner.nextInt();
+
+                if (response == 1) {
+                    System.out.println("You have selected Immediate Payment!");
+                    newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAID);
+                } else if (response == 2) {
+                    System.out.println("You have selected Deferred Payment!");
+                    newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAY_ON_SITE);
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+
             Long reservationTransactionId = reservationTransactionSessionBeanRemote.createNewReservationTransaction(newReservationTransaction);
             reservation.setReservationNumber("A0" + reservationTransactionId);
             Long reservationId = reservationSessionBeanRemote.createNewReservation(reservation);
-            
+
             reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setReservationTransaction(newReservationTransaction);
-            System.out.print("You have successfully made the reservation your! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: " + reservation.getReservationNumber());
-        } catch (UnknownPersistenceException | InputDataValidationException | ReservationNumberExistException | ReservationNotFoundException ex) {
+            reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setOwnCustomer(currentOwnCustomer);
+            System.out.print("You have successfully made the reservation your! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: " + reservation.getReservationNumber() + "\n");
+        } catch (CustomerNotFoundException | UnknownPersistenceException | InputDataValidationException | ReservationNumberExistException | ReservationNotFoundException  ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -667,24 +672,25 @@ public class MainApp {
 
     private void doRecordCreditCardInformation() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Before Proceeding Please Enter Your Credit Card Details!");
+        System.out.print("Before Proceeding Please Enter Your Credit Card Details!\n");
         CreditCard newCreditCard = new CreditCard();
-        newCreditCard.setCustomer(currentOwnCustomer);
 
         System.out.print("Enter Name On Card> ");
         newCreditCard.setNameOnCard(scanner.nextLine().trim());
         System.out.print("Enter Card Number> ");
         newCreditCard.setCardNumber(scanner.nextLine().trim());
-        System.out.print("Enter CVV pin> ");
-        newCreditCard.setCreditVerificationValue(scanner.nextInt());
         System.out.print("Enter ExpiryDate(MM/YY)> ");
         newCreditCard.setExpiryDate(scanner.nextLine().trim());
+        System.out.print("Enter CVV pin> ");
+        newCreditCard.setCreditVerificationValue(scanner.nextInt());
 
         try {
             Long creditCardId = creditCardSessionBeanRemote.createNewCreditCard(newCreditCard);
+            customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).setCreditCard(creditCardSessionBeanRemote.retrieveCreditCardByCreditCardId(creditCardId));
+            System.out.println(customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard());
             System.out.println("You have successfully added your Credit Card!: " + creditCardId);
-            currentOwnCustomer.setCreditCard(newCreditCard);
-        } catch (CardNumberExistException | UnknownPersistenceException | InputDataValidationException ex) {
+
+        } catch ( CreditCardNotFoundException | CustomerNotFoundException | CardNumberExistException | UnknownPersistenceException | InputDataValidationException ex) {
             ex.printStackTrace();
         }
 

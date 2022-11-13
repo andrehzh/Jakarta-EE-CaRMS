@@ -34,4 +34,7 @@ public interface CreditCardSessionBeanRemote {
     public void deleteCreditCard(Long creditCardId) throws CreditCardNotFoundException, DeleteCreditCardException;
     
     
+    public CreditCard retrieveCreditCardByCustomerId(Long customerId) throws CreditCardNotFoundException;
+    
+    
 }

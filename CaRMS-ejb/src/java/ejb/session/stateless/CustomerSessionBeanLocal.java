@@ -26,26 +26,27 @@ public interface CustomerSessionBeanLocal {
 
     public Long createNewCustomer(Customer newCustomer) throws CustomerEmailExistException, UnknownPersistenceException, InputDataValidationException;
 
-    public List<Customer> retrieveAllCustomers();
-
-    public Customer retrieveCustomerByCustomerId(Long customerId) throws CustomerNotFoundException;
-
-    public void updateCustomer(Customer customer) throws CustomerNotFoundException, UpdateCustomerException, InputDataValidationException;
-
-    public void deleteCustomer(Long customerId) throws CustomerNotFoundException, DeleteCustomerException;
-
-    public Customer retrieveOwnCustomerByPassportNumber(String passportNumber) throws CustomerNotFoundException;
-
-    public OwnCustomer customerLogin(String passportNumber, String password) throws InvalidLoginCredentialException;
-
     public Long createNewOwnCustomer(OwnCustomer newOwnCustomer) throws CustomerEmailExistException, UnknownPersistenceException, InputDataValidationException;
 
     public List<OwnCustomer> retrieveAllOwnCustomers();
 
     public OwnCustomer retrieveOwnCustomerByCustomerId(Long ownCustomerId) throws CustomerNotFoundException;
 
+    public List<Customer> retrieveAllCustomers();
+
+    public Customer retrieveCustomerByCustomerId(Long customerId) throws CustomerNotFoundException;
+
+    public OwnCustomer retrieveOwnCustomerByPassportNumber(String passportNumber) throws CustomerNotFoundException;
+
+    public OwnCustomer customerLogin(String passportNumber, String password) throws InvalidLoginCredentialException;
+
+    public void updateCustomer(Customer customer) throws CustomerNotFoundException, UpdateCustomerException, InputDataValidationException;
+
     public void updateOwnCustomer(OwnCustomer ownCustomer) throws CustomerNotFoundException, UpdateCustomerException, InputDataValidationException;
 
+    public void deleteCustomer(Long customerId) throws CustomerNotFoundException, DeleteCustomerException;
+
     public void deleteOwnCustomer(Long ownCustomerId) throws CustomerNotFoundException, DeleteCustomerException;
+
     
 }

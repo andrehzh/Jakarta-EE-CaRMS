@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -87,6 +89,18 @@ public class CreditCardSessionBean implements CreditCardSessionBeanRemote, Credi
             throw new CreditCardNotFoundException("Credit Card ID " + creditCardId + " does not exist!");
         }
     }
+    
+    @Override
+    public CreditCard retrieveCreditCardByCustomerId(Long customerId) throws CreditCardNotFoundException {
+        Query query = em.createQuery("SELECT c FROM CreditCard c WHERE c.customer.customerId = :inCustomerId");
+        query.setParameter("inCustomerId", customerId);
+
+        try {
+            return (CreditCard) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new CreditCardNotFoundException("Customer " + customerId + " does not exist!");
+        }
+    }
 
     @Override
     public void updateCreditCard(CreditCard creditCard) throws CreditCardNotFoundException, UpdateCreditCardException, InputDataValidationException {
@@ -98,7 +112,6 @@ public class CreditCardSessionBean implements CreditCardSessionBeanRemote, Credi
 
                 if (creditCardToUpdate.getCardNumber().equals(creditCard.getCardNumber())) {
                     creditCardToUpdate.setNameOnCard(creditCard.getNameOnCard());
-                    creditCardToUpdate.setCustomer(creditCard.getCustomer());
                     // note able to update cardNum, cvv, expirydate
                 } else {
                     throw new UpdateCreditCardException("UpdateCreditCardException");

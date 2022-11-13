@@ -43,10 +43,6 @@ public class CreditCard implements Serializable {
     @NotNull
     private String expiryDate;
 
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Customer customer;
-
     public CreditCard() {
     }
 
@@ -62,20 +58,6 @@ public class CreditCard implements Serializable {
      */
     public String getNameOnCard() {
         return nameOnCard;
-    }
-
-    /**
-     * @return the customer
-     */
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    /**
-     * @param customer the customer to set
-     */
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 
     /**

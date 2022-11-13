@@ -31,5 +31,7 @@ public interface CreditCardSessionBeanLocal {
     public void updateCreditCard(CreditCard creditCard) throws CreditCardNotFoundException, UpdateCreditCardException, InputDataValidationException;
 
     public void deleteCreditCard(Long creditCardId) throws CreditCardNotFoundException, DeleteCreditCardException;
+
+    public CreditCard retrieveCreditCardByCustomerId(Long customerId) throws CreditCardNotFoundException;
     
 }

@@ -195,14 +195,14 @@ public class DataInitSessionBean {
 
             partnerSessionBeanLocal.createNewPartner(new Partner("Holiday.com"));
             
-            //for testing purposes
-            reservationSessionBeanLocal.createNewReservation(new Reservation("A1", LocalDateTime.of(2022, 12, 6, 14, 00), LocalDateTime.of(2022, 12, 10, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A")));
-            reservationSessionBeanLocal.createNewReservation(new Reservation("A2", LocalDateTime.of(2022, 12, 2, 14, 00), LocalDateTime.of(2022, 12, 3, 12, 00), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B")));
-            reservationSessionBeanLocal.createNewReservation(new Reservation("A3", LocalDateTime.of(2022, 12, 2, 10, 0), LocalDateTime.of(2022, 12, 3, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A")));
-            reservationSessionBeanLocal.createNewReservation(new Reservation("B1", LocalDateTime.of(2022, 12, 10, 10, 0), LocalDateTime.of(2022, 12, 10, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B")));
-            reservationSessionBeanLocal.createNewReservation(new Reservation("B2", LocalDateTime.of(2022, 12, 8, 14, 00), LocalDateTime.of(2022, 12, 9, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A")));
+//            //for testing purposes
+//            reservationSessionBeanLocal.createNewReservation(new Reservation("A1", LocalDateTime.of(2022, 12, 6, 14, 00), LocalDateTime.of(2022, 12, 10, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A")));
+//            reservationSessionBeanLocal.createNewReservation(new Reservation("A2", LocalDateTime.of(2022, 12, 2, 14, 00), LocalDateTime.of(2022, 12, 3, 12, 00), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B")));
+//            reservationSessionBeanLocal.createNewReservation(new Reservation("A3", LocalDateTime.of(2022, 12, 2, 10, 0), LocalDateTime.of(2022, 12, 3, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A")));
+//            reservationSessionBeanLocal.createNewReservation(new Reservation("B1", LocalDateTime.of(2022, 12, 10, 10, 0), LocalDateTime.of(2022, 12, 10, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet B")));
+//            reservationSessionBeanLocal.createNewReservation(new Reservation("B2", LocalDateTime.of(2022, 12, 8, 14, 00), LocalDateTime.of(2022, 12, 9, 12, 0), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A"), outletSessionBeanLocal.retrieveOutletByOutletName("Outlet A")));
             //} catch (CategoryNotFoundException | RentalRateNotFoundException | CarNotFoundException | CarModelNotFoundException | OutletNotFoundException | CarPlateExistsException | UnknownPersistenceException | PersistenceException | InputDataValidationException ex) {
-        } catch ( ReservationNumberExistException | CarModelNameExistException | OutletNameExistException | CategoryNotFoundException | RentalRateNotFoundException | CarNotFoundException | CarModelNotFoundException | OutletNotFoundException | EmployeeNotFoundException | PartnerNameExistException | CarPlateExistsException | CategoryNameExistsException | EmployeeEmailExistsException | UnknownPersistenceException | PersistenceException | InputDataValidationException ex) {
+        } catch ( CarModelNameExistException | OutletNameExistException | CategoryNotFoundException | RentalRateNotFoundException | CarNotFoundException | CarModelNotFoundException | OutletNotFoundException | EmployeeNotFoundException | PartnerNameExistException | CarPlateExistsException | CategoryNameExistsException | EmployeeEmailExistsException | UnknownPersistenceException | PersistenceException | InputDataValidationException ex) {
             ex.printStackTrace();
         }
     }

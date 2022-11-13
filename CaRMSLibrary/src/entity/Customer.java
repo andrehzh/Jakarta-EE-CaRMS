@@ -8,12 +8,10 @@ package entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
@@ -24,8 +22,6 @@ import javax.validation.constraints.Size;
  * @author andre
  */
 @Entity
-//thinking about this one...
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,7 +41,7 @@ public class Customer implements Serializable {
     @Size(min = 1, max = 9)
     private String customerPhoneNum;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private CreditCard creditCard;
     
     @ManyToOne(optional = true)
