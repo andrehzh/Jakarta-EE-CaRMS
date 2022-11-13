@@ -8,7 +8,6 @@ package carmsreservationclient;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
-import ejb.session.stateless.CreditCardSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
@@ -36,7 +35,6 @@ public class CustomerReservationModule {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
-    private CreditCardSessionBeanRemote creditCardSessionBeanRemote;
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private CustomerReservationModule customerReservationModule;
 
@@ -50,7 +48,7 @@ public class CustomerReservationModule {
         validator = validatorFactory.getValidator();
     }
 
-    public CustomerReservationModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, ReservationTransactionSessionBeanRemote reservationTransactionSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, CreditCardSessionBeanRemote creditCardSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, CustomerReservationModule customerReservationModule, OwnCustomer currentOwnCustomer) {
+    public CustomerReservationModule(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, ReservationTransactionSessionBeanRemote reservationTransactionSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, CustomerReservationModule customerReservationModule, OwnCustomer currentOwnCustomer) {
         this();
 
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
@@ -61,7 +59,6 @@ public class CustomerReservationModule {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
-        this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.customerReservationModule = customerReservationModule;
         this.currentOwnCustomer = currentOwnCustomer;

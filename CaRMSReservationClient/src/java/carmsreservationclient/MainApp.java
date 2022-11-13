@@ -3,7 +3,6 @@ package carmsreservationclient;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
-import ejb.session.stateless.CreditCardSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
@@ -13,7 +12,6 @@ import ejb.session.stateless.ReservationTransactionSessionBeanRemote;
 import entity.Car;
 import entity.CarModel;
 import entity.Category;
-import entity.CreditCard;
 import entity.Outlet;
 import entity.OwnCustomer;
 import entity.RentalRate;
@@ -46,6 +44,7 @@ import util.exception.RentalRateNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.ReservationNumberExistException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCustomerException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -66,7 +65,6 @@ public class MainApp {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
-    private CreditCardSessionBeanRemote creditCardSessionBeanRemote;
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private CustomerReservationModule customerReservationModule;
 
@@ -80,7 +78,7 @@ public class MainApp {
         validator = validatorFactory.getValidator();
     }
 
-    public MainApp(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, ReservationTransactionSessionBeanRemote reservationTransactionSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, CreditCardSessionBeanRemote creditCardSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
+    public MainApp(RentalRateSessionBeanRemote rentalRateSessionBeanRemote, ReservationTransactionSessionBeanRemote reservationTransactionSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
         this();
 
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
@@ -91,7 +89,6 @@ public class MainApp {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
-        this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
 
@@ -118,18 +115,17 @@ public class MainApp {
                     try {
                         doCustomerLogin();
                         System.out.println("*** Successfull Logged In! ***\n");
-                        System.out.print(customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard() == null);
 
-                    } catch (CustomerNotFoundException | InvalidLoginCredentialException ex) {
+                    } catch (InvalidLoginCredentialException ex) {
                         ex.printStackTrace();
                     }
                 } else if (response == 2) {
                     doRegisterNewCustomer();
                 } else if (response == 3) {
-                    doRecordCreditCardInformation();
+                    doSearchCar();
                 } else if (response == 4) {
                     if (currentOwnCustomer != null) {
-                        customerReservationModule = new CustomerReservationModule(rentalRateSessionBeanRemote, reservationTransactionSessionBeanRemote, outletSessionBeanRemote, reservationSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, partnerSessionBeanRemote, creditCardSessionBeanRemote, customerSessionBeanRemote, customerReservationModule, currentOwnCustomer);
+                        customerReservationModule = new CustomerReservationModule(rentalRateSessionBeanRemote, reservationTransactionSessionBeanRemote, outletSessionBeanRemote, reservationSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, partnerSessionBeanRemote, customerSessionBeanRemote, customerReservationModule, currentOwnCustomer);
                     } else {
                         try {
                             throw new InvalidLoginCredentialException("No customer logged in!!");
@@ -428,6 +424,7 @@ public class MainApp {
             searchReservation.setDropOffOutlet(selectedDropOffOutlet);
 
             List<Reservation> pendingReservations = reservationSessionBeanRemote.retrieveAllReservations();
+//            System.out.println(pendingReservations.toString());
             List<Car> allCars = carSessionBeanRemote.retrieveAllCars();
             List<Car> availableCars = new ArrayList<>();
             for (Car car : allCars) {
@@ -439,7 +436,7 @@ public class MainApp {
 //            System.out.println(availableCars.toString());
             //sorts the pending reservations by earliest
             Collections.sort(pendingReservations, (Reservation o1, Reservation o2) -> o1.getPickUpDateTime().compareTo(o2.getPickUpDateTime()));
-//            System.out.println(pendingReservations.toString());
+
 
             //find conflicting reservations
             //loop through the list to find similar or conflicting reservations and get a number of conflicting reservations?
@@ -483,8 +480,9 @@ public class MainApp {
                     }
                 }
             }
+            
 
-//            System.out.println(conflictingReservations.toString());
+            System.out.println(conflictingReservations.toString());
             //check the cars to see which fits
             //now all i have to do is minus
             List<Car> suitableCars = new ArrayList<>();
@@ -627,11 +625,10 @@ public class MainApp {
     private void doMakeReservation(Reservation reservation, BigDecimal transactionAmount) {
         try {
             Scanner scanner = new Scanner(System.in);
-            if (customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard() == null) {
+            if (customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCcNumber() == null) {
                 doRecordCreditCardInformation();
             }
-            CreditCard customerCard = customerSessionBeanRemote.retrieveCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard();
-            System.out.println("You will use CreditCard: " + customerCard.getCardNumber());
+            System.out.println("You will use CreditCard: " + currentOwnCustomer.getCcNumber());
             System.out.println("*** Please select a payment option! ***\n");
             System.out.println("1: Immediate Rental Fee Payment");
             System.out.println("2: Deferred Rental Fee Payment");
@@ -663,7 +660,7 @@ public class MainApp {
 
             reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setReservationTransaction(newReservationTransaction);
             reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setOwnCustomer(currentOwnCustomer);
-            System.out.print("You have successfully made the reservation your! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: " + reservation.getReservationNumber() + "\n");
+            System.out.print("You have successfully made the reservation! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: " + reservation.getReservationNumber() + "\n");
         } catch (CustomerNotFoundException | UnknownPersistenceException | InputDataValidationException | ReservationNumberExistException | ReservationNotFoundException  ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -673,25 +670,23 @@ public class MainApp {
     private void doRecordCreditCardInformation() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Before Proceeding Please Enter Your Credit Card Details!\n");
-        CreditCard newCreditCard = new CreditCard();
+        
 
-        System.out.print("Enter Name On Card> ");
-        newCreditCard.setNameOnCard(scanner.nextLine().trim());
+        String ccNum = "";
+        String cvv = "";
+        
         System.out.print("Enter Card Number> ");
-        newCreditCard.setCardNumber(scanner.nextLine().trim());
-        System.out.print("Enter ExpiryDate(MM/YY)> ");
-        newCreditCard.setExpiryDate(scanner.nextLine().trim());
+        ccNum = scanner.nextLine().trim();
+
         System.out.print("Enter CVV pin> ");
-        newCreditCard.setCreditVerificationValue(scanner.nextInt());
+        cvv = scanner.nextLine().trim();
 
+        currentOwnCustomer.setCcNumber(ccNum);
+        currentOwnCustomer.setCvv(cvv);
         try {
-            Long creditCardId = creditCardSessionBeanRemote.createNewCreditCard(newCreditCard);
-            customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).setCreditCard(creditCardSessionBeanRemote.retrieveCreditCardByCreditCardId(creditCardId));
-            System.out.println(customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getCreditCard());
-            System.out.println("You have successfully added your Credit Card!: " + creditCardId);
-
-        } catch ( CreditCardNotFoundException | CustomerNotFoundException | CardNumberExistException | UnknownPersistenceException | InputDataValidationException ex) {
-            ex.printStackTrace();
+            customerSessionBeanRemote.updateOwnCustomer(currentOwnCustomer);
+        } catch (CustomerNotFoundException | UpdateCustomerException | InputDataValidationException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

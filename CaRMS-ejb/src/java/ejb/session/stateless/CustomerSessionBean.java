@@ -172,7 +172,8 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
                 Customer customerToUpdate = retrieveCustomerByCustomerId(customer.getCustomerId());
 
                 if (customerToUpdate.getCustomerEmail().equals(customer.getCustomerEmail())) {
-                    customerToUpdate.setCreditCard(customer.getCreditCard());
+                    customerToUpdate.setCcNumber(customer.getCcNumber());
+                    customerToUpdate.setCvv(customer.getCvv());
                     customerToUpdate.setCustomerName(customer.getCustomerName());
                     customerToUpdate.setCustomerPhoneNum(customer.getCustomerPhoneNum());
                     customerToUpdate.setPartner(customer.getPartner());
@@ -197,8 +198,8 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
                 OwnCustomer ownCustomerToUpdate = retrieveOwnCustomerByCustomerId(ownCustomer.getCustomerId());
 
                 if (ownCustomerToUpdate.getPassportNumber().equals(ownCustomer.getPassportNumber())) {
-                    ownCustomerToUpdate.setCreditCard(ownCustomer.getCreditCard());
-                    ownCustomerToUpdate.setCustomerEmail(ownCustomer.getCustomerEmail());
+                    ownCustomerToUpdate.setCcNumber(ownCustomer.getCcNumber());
+                    ownCustomerToUpdate.setCvv(ownCustomer.getCvv());
                     ownCustomerToUpdate.setCustomerName(ownCustomer.getCustomerName());
                     ownCustomerToUpdate.setCustomerPassword(ownCustomer.getCustomerPassword());
                     ownCustomerToUpdate.setCustomerPhoneNum(ownCustomer.getCustomerPhoneNum());
@@ -218,11 +219,11 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     public void deleteCustomer(Long customerId) throws CustomerNotFoundException, DeleteCustomerException {
         Customer customerToRemove = retrieveCustomerByCustomerId(customerId);
         //if remove customer need to remove credit card also.
-        if (customerToRemove.getCreditCard() == null) {
+        try {
             em.remove(customerToRemove);
-        } else {
+        } catch (PersistenceException ex) {
             // New in v4.1 to prevent deleting staff with existing sale transaction(s)
-            throw new DeleteCustomerException("Customer ID " + customerId + " is associated with existing credit card and cannot be deleted!");
+            throw new DeleteCustomerException("Customer ID " + customerId + " cannot be deleted!");
         }
     }
 
@@ -230,11 +231,11 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     public void deleteOwnCustomer(Long ownCustomerId) throws CustomerNotFoundException, DeleteCustomerException {
         OwnCustomer ownCustomerToRemove = retrieveOwnCustomerByCustomerId(ownCustomerId);
         //if remove OwnCustomer need to remove credit card also.
-        if (ownCustomerToRemove.getCreditCard() == null) {
+        try {
             em.remove(ownCustomerToRemove);
-        } else {
+        } catch (PersistenceException ex) {
             // New in v4.1 to prevent deleting staff with existing sale transaction(s)
-            throw new DeleteCustomerException("Customer ID " + ownCustomerId + "cannot be deleted!");
+            throw new DeleteCustomerException("Customer ID " + ownCustomerId + " cannot be deleted!");
         }
     }
 

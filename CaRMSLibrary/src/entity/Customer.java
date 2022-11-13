@@ -40,9 +40,12 @@ public class Customer implements Serializable {
     @NotNull
     @Size(min = 1, max = 9)
     private String customerPhoneNum;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private CreditCard creditCard;
+    @Column(unique = true, length = 16)
+    @Size(min = 1, max = 16)
+    private String ccNumber;
+    @Column(unique = true, length = 3)
+    @Size(min = 1, max = 16)
+    private String cvv;
     
     @ManyToOne(optional = true)
     private Partner partner;
@@ -62,6 +65,34 @@ public class Customer implements Serializable {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    /**
+     * @return the ccNumber
+     */
+    public String getCcNumber() {
+        return ccNumber;
+    }
+
+    /**
+     * @param ccNumber the ccNumber to set
+     */
+    public void setCcNumber(String ccNumber) {
+        this.ccNumber = ccNumber;
+    }
+
+    /**
+     * @return the cvv
+     */
+    public String getCvv() {
+        return cvv;
+    }
+
+    /**
+     * @param cvv the cvv to set
+     */
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
     }
 
     /**
@@ -118,20 +149,6 @@ public class Customer implements Serializable {
      */
     public void setCustomerPhoneNum(String customerPhoneNum) {
         this.customerPhoneNum = customerPhoneNum;
-    }
-
-    /**
-     * @return the creditCard
-     */
-    public CreditCard getCreditCard() {
-        return creditCard;
-    }
-
-    /**
-     * @param creditCard the creditCard to set
-     */
-    public void setCreditCard(CreditCard creditCard) {
-        this.creditCard = creditCard;
     }
 
     @Override
