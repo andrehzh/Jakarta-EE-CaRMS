@@ -10,5 +10,5 @@ package util.enumeration;
  * @author tian
  */
 public enum CarStatusEnum {
-    AVAILABLE, RESERVED, IN_TRANSIT, SERVICE_REPAIR;
+    AVAILABLE, RESERVED, IN_TRANSIT, SERVICE_REPAIR, DISABLED;
 }

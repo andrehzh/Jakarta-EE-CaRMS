@@ -17,6 +17,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
 import util.exception.CarPlateExistsException;
 import util.exception.DeleteCarException;
@@ -124,8 +125,8 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException {
         Car carToRemove = retrieveCarById(carId);
 
-        if (carToRemove.getReservation() == null) {
-            carToRemove.setIsDisabled(true);
+        if (carToRemove.getReservation() != null) {
+            carToRemove.setCarStatus(CarStatusEnum.DISABLED);
             throw new DeleteCarException("Car " + carId.toString() + " is associated with an existing reservation and cannot be deleted! It has been disabled and cannot be rented out.");
 
         } else {

@@ -109,7 +109,7 @@ public class CustomerServiceModule {
             String cp = scanner.next();
             try {
                 car = carSessionBeanRemote.retrieveCarByCarPlate(cp);
-                if (car.isIsDisabled()) {
+                if (car.getCarStatus().equals(CarStatusEnum.DISABLED)) {
                     System.out.println("This car is disabled!");
                     return;
                 }
@@ -160,7 +160,7 @@ public class CustomerServiceModule {
         String cp = scanner.next();
         try {
             car = carSessionBeanRemote.retrieveCarByCarPlate(cp);
-            if (car.isIsDisabled()) {
+            if (car.getCarStatus().equals(CarStatusEnum.DISABLED)) {
                 System.out.println("This car is disabled!");
                 return;
             }

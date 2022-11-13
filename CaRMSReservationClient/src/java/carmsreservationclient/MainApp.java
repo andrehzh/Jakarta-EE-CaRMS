@@ -704,7 +704,7 @@ public class MainApp {
         }
 
     }
-    
+
     private void doLogout() {
         if (currentOwnCustomer != null) {
             currentOwnCustomer = null;
