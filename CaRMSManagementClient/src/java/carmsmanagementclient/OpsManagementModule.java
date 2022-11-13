@@ -199,9 +199,10 @@ public class OpsManagementModule {
         System.out.print("Enter Car Model ID> ");
         try {
             carModel = carModelSessionBeanRemote.retrieveCarModelById(scanner.nextLong());
+            scanner.nextLine();
 
             System.out.print("Enter Car Make (blank if no change)> ");
-            input = scanner.next().trim();
+            input = scanner.nextLine().trim();
             if (input.length() > 0) {
                 carModel.setCarModelBrand(input);
             }
@@ -254,9 +255,10 @@ public class OpsManagementModule {
         System.out.print("Enter Car Model ID> ");
         try {
             carModel = carModelSessionBeanRemote.retrieveCarModelById(scanner.nextLong());
+            scanner.nextLine();
 
             System.out.printf("Confirm Delete Car Model %s %s (Enter 'Y' to Delete)> ", carModel.getCarModelBrand(), carModel.getCarModelName());
-            input = scanner.next().trim();
+            input = scanner.nextLine().trim();
 
             if (input.equals("Y") || input.equals("y")) {
                 try {
@@ -312,7 +314,7 @@ public class OpsManagementModule {
             while (response < 1 || response > 4) {
                 System.out.print("> ");
                 response = scanner.nextInt();
-
+                scanner.nextLine();
                 if (response == 1) {
                     newCar.setCarStatus(CarStatusEnum.AVAILABLE);
                     System.out.println("Enter Outlet Name>");
@@ -449,7 +451,7 @@ public class OpsManagementModule {
             while (response < 1 || response > 5) {
                 System.out.print("> ");
                 response = scanner.nextInt();
-
+                scanner.next();
                 if (response == 1) {
                     car.setCarStatus(CarStatusEnum.AVAILABLE);
                     System.out.println("Enter Outlet Name>");

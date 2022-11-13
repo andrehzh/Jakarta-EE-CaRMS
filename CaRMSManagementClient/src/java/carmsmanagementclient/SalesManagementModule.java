@@ -278,6 +278,7 @@ public class SalesManagementModule {
 
         System.out.print("Enter Rate per Day (zero or negative number if no change)> $");
         bigDecimalInput = scanner.nextBigDecimal();
+        scanner.nextLine();
         if (bigDecimalInput.compareTo(BigDecimal.ZERO) > 0) {
             rentalRate.setRentalAmount(bigDecimalInput);
         }
@@ -287,9 +288,9 @@ public class SalesManagementModule {
         int day = 0;
         int hour = 0;
         int minute = 0;
-
+        
         System.out.print("Change Validity Start Date? (Enter Y to edit or leave blank if no change)> ");
-        input = scanner.next().trim();
+        input = scanner.nextLine().trim();
         if (input.equals("y") || input.equals("Y")) {
             System.out.println("*** Please enter the Validity Start Details Accordingly ***");
             System.out.print("Enter Year(YYYY)> ");
