@@ -487,7 +487,7 @@ public class MainApp {
                 }
             }
 
-            System.out.println(conflictingReservations.toString());
+//            System.out.println(conflictingReservations.toString());
             //check the cars to see which fits
             //now all i have to do is minus
             List<Car> suitableCars = new ArrayList<>();
