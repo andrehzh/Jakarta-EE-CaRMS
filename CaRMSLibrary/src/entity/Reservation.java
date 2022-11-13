@@ -12,9 +12,11 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import static javax.persistence.FetchType.EAGER;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -47,13 +49,15 @@ public class Reservation implements Serializable {
     @NotNull
     private ReservationPickupStatusEnum reservationPickupStatus;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade=CascadeType.ALL)
     private Partner partner;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(optional=false)
+    @JoinColumn(nullable=false)
     private OwnCustomer ownCustomer;
 
-    @OneToOne
+    @OneToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name="RT_ID")
     private ReservationTransaction reservationTransaction;
 
     @OneToMany

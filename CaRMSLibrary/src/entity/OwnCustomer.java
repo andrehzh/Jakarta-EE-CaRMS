@@ -7,8 +7,10 @@ package entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import static javax.persistence.FetchType.EAGER;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,7 +31,7 @@ public class OwnCustomer extends Customer {
     @Size(min = 1, max = 64)
     private String passportNumber;
     
-    @OneToMany(mappedBy = "ownCustomer")
+    @OneToMany(mappedBy = "ownCustomer", cascade=CascadeType.ALL, fetch=EAGER)
     private List<Reservation> reservations;
 
     public OwnCustomer() {
