@@ -114,52 +114,43 @@ public class CustomerReservationModule {
             System.out.println("2: Exit\n");
             response = 0;
             Reservation selectedReservation = null;
-            while (true) {
-                while (response < 1 || response > 2) {
-                    System.out.print("> ");
 
-                    response = scanner.nextInt();
+            while (response < 1 || response > 2) {
+                System.out.print("> ");
 
-                    if (response == 1) {
-                        System.out.println("Please select an option!\n");
-                        int catRef = 0;
-                        for (Reservation reservation : allReservations) {
+                response = scanner.nextInt();
 
-                            System.out.println(catRef + 1 + ": " + reservation.getReservationNumber());
-                            catRef++;
+                if (response == 1) {
+                    System.out.println("Please select an option!\n");
+                    int catRef = 0;
+                    for (Reservation reservation : allReservations) {
 
-                        }
+                        System.out.println(catRef + 1 + ": " + reservation.getReservationNumber());
                         catRef++;
-                        System.out.println(catRef + ": Exit\n");
-                        response = 0;
-                        while (response < 1 || response > catRef) {
-                            System.out.print("> ");
 
-                            response = scanner.nextInt();
+                    }
+                    catRef++;
+                    System.out.println(catRef + ": Exit\n");
+                    response = 0;
+                    while (response < 1 || response > catRef) {
+                        System.out.print("> ");
 
-                            if (response > 0 && response < catRef) {
-                                selectedReservation = allReservations.get(response - 1);
-                                System.out.println("You have selected Reservation: " + selectedReservation.getReservationNumber() + "!\n");
-                                doDisplayReservationDetail(selectedReservation);
-                                break;
-                            } else if (response == catRef) {
-                                break;
-                            } else {
-                                System.out.println("Invalid option, please try again!\n");
-                            }
+                        response = scanner.nextInt();
+
+                        if (response > 0 && response < catRef) {
+                            selectedReservation = allReservations.get(response - 1);
+                            System.out.println("You have selected Reservation: " + selectedReservation.getReservationNumber() + "!\n");
+                            doDisplayReservationDetail(selectedReservation);
+
+                        } else if (response == catRef) {
+                            break;
+                        } else {
+                            System.out.println("Invalid option, please try again!\n");
                         }
-
-                    } else if (response == 2) {
-                        break;
-                    } else {
-                        System.out.println("Invalid option, please try again!\n");
                     }
                 }
-
-                if (response == 2) {
-                    break;
-                }
             }
+
         } catch (ReservationNotFoundException ex) {
             Logger.getLogger(CustomerReservationModule.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -170,37 +161,34 @@ public class CustomerReservationModule {
         System.out.println("Reservation Number: " + reservation.getReservationNumber());
         System.out.println("Reservation Pick Up Date: " + reservation.getPickUpDateTime());
         System.out.println("Reservation Drop Off Date: " + reservation.getDropOffDateTime());
-        System.out.println("Reservation Pick Up Outlet: " + reservation.getPickUpOutlet());
-        System.out.println("Reservation Drop Off Outlet: " + reservation.getDropOffOutlet());
+        System.out.println("Reservation Pick Up Outlet: " + reservation.getPickUpOutlet().getOutletName());
+        System.out.println("Reservation Drop Off Outlet: " + reservation.getDropOffOutlet().getOutletName());
         int response = 0;
-        while (true) {
-            System.out.println("\n*** Select an Option ***");
-            System.out.println("1: Cancel Reservation");
-            System.out.println("2: Exit\n");
-            while (response < 1 || response > 2) {
-                System.out.print("> ");
 
-                response = scanner.nextInt();
+        System.out.println("\n*** Select an Option ***");
+        System.out.println("1: Cancel Reservation");
+        System.out.println("2: Exit\n");
+        while (response < 1 || response > 2) {
+            System.out.print("> ");
 
-                if (response == 1) {
-                    try {
-                        reservationSessionBeanRemote.deleteReservation(reservation.getReservationId());
-                        System.out.println("Reservation has been deleted successfully!");
-                        break;
-                    } catch (ReservationNotFoundException | DeleteReservationException ex) {
-                        Logger.getLogger(CustomerReservationModule.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else if (response == 2) {
+            response = scanner.nextInt();
+
+            if (response == 1) {
+                try {
+                    reservationSessionBeanRemote.deleteReservation(reservation.getReservationId());
+                    System.out.println("Reservation has been deleted successfully!");
+                    System.out.println("No Cancellation Fees");
                     break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
+                } catch (ReservationNotFoundException | DeleteReservationException ex) {
+                    Logger.getLogger(CustomerReservationModule.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-
-            if (response == 2) {
+            } else if (response == 2) {
                 break;
+            } else {
+                System.out.println("Invalid option, please try again!\n");
             }
         }
+
     }
 
 }
