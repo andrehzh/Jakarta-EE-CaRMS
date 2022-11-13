@@ -404,7 +404,6 @@ public class MainApp {
 
                 System.out.println("You have selected! \nCategory> " + categoryStr + "\nCar Model> " + cmStr + "\nStart Date & Time: " + selectedStartDateTime + "\nEnd Date & Time: " + selectedEndDateTime + "\nPick Up Outlet> " + selectedPickUpOutlet.getOutletName() + "\nDrop Off Outlet> " + selectedDropOffOutlet.getOutletName() + "\n");
             }
-//NOW IS THE FUCKING CODEEEE
 //assuming that i have all the details how should i go about it
 //if(have) else(all)
 //im going to need my days of availability?or should i use my ejb shit..
@@ -610,9 +609,11 @@ public class MainApp {
             for (LocalDateTime date : totalDates) {
                 RentalRate currentRentalRate = defaultRentalRate;
                 for (RentalRate rentalRate : categoryRentalRates) {
-                    if (rentalRate.getStartDateTime() != null) {
-                        if (date.plusMinutes(1).isAfter(rentalRate.getStartDateTime()) && date.minusMinutes(1).isBefore(rentalRate.getEndDateTime()) && rentalRate.getRentalAmount().subtract(currentRentalRate.getRentalAmount()).intValue() < 0) {
-                            currentRentalRate = rentalRate;
+                    if (rentalRate.isIsDisabled() == false) {
+                        if (rentalRate.getStartDateTime() != null) {
+                            if (date.plusMinutes(1).isAfter(rentalRate.getStartDateTime()) && date.minusMinutes(1).isBefore(rentalRate.getEndDateTime()) && rentalRate.getRentalAmount().subtract(currentRentalRate.getRentalAmount()).intValue() < 0) {
+                                currentRentalRate = rentalRate;
+                            }
                         }
                     }
                 }
@@ -704,7 +705,7 @@ public class MainApp {
         }
 
     }
-    
+
     private void doLogout() {
         if (currentOwnCustomer != null) {
             currentOwnCustomer = null;
