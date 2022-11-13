@@ -30,27 +30,27 @@ import util.exception.UpdateReservationException;
  */
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
-    
+
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-    
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-    
+
     public ReservationSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
-    
+
     @Override
     public Long createNewReservation(Reservation newReservation) throws ReservationNumberExistException, UnknownPersistenceException, InputDataValidationException {
         Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(newReservation);
-        
+
         if (constraintViolations.isEmpty()) {
             try {
                 em.persist(newReservation);
                 em.flush();
-                
+
                 return newReservation.getReservationId();
             } catch (PersistenceException ex) {
                 if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
@@ -67,33 +67,45 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
-    
+
     @Override
     public List<Reservation> retrieveAllReservations() {
         Query query = em.createQuery("SELECT r FROM Reservation r");
-        
+
         return query.getResultList();
     }
-    
+
     @Override
     public Reservation retrieveReservationByReservationId(Long reservationId) throws ReservationNotFoundException {
         Reservation reservation = em.find(Reservation.class, reservationId);
-        
+
         if (reservation != null) {
             return reservation;
         } else {
             throw new ReservationNotFoundException("Reservation ID " + reservationId + " does not exist!");
         }
     }
-    
+
+    @Override
+    public Reservation retrieveReservationByReservationNumber(String reservationNumber) throws ReservationNotFoundException {
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.reservationNumber = :inReservationNumber");
+        query.setParameter("inReservationNumber", reservationNumber);
+
+        if (query.getSingleResult() != null) {
+            return (Reservation) query.getSingleResult();
+        } else {
+            throw new ReservationNotFoundException("Reservation Num " + reservationNumber + " does not exist!");
+        }
+    }
+
     @Override
     public void updateReservation(Reservation reservation) throws ReservationNotFoundException, UpdateReservationException, InputDataValidationException {
         if (reservation != null && reservation.getReservationId() != null) {
             Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
-            
+
             if (constraintViolations.isEmpty()) {
                 Reservation reservationToUpdate = retrieveReservationByReservationId(reservation.getReservationId());
-                
+
                 if (reservationToUpdate.getReservationNumber().equals(reservation.getReservationNumber())) {
                     reservationToUpdate.setPickUpDateTime(reservation.getPickUpDateTime());
                     reservationToUpdate.setDropOffDateTime(reservation.getDropOffDateTime());
@@ -116,7 +128,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("ReservationNotFoundException");
         }
     }
-    
+
     @Override
     public void deleteReservation(Long reservationId) throws ReservationNotFoundException, DeleteReservationException {
         Reservation reservationToRemove = retrieveReservationByReservationId(reservationId);
@@ -124,19 +136,19 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         if (reservationToRemove.getCar() == null) {
             em.remove(reservationToRemove);
         } else {
-    
+
             throw new DeleteReservationException("Reservation ID " + reservationId + "cannot be as there is a car tagged to it deleted!");
         }
     }
-    
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Reservation>> constraintViolations) {
         String msg = "Input data validation error!:";
-        
+
         for (ConstraintViolation constraintViolation : constraintViolations) {
             msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
         }
-        
+
         return msg;
     }
-    
+
 }

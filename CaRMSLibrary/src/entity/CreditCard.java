@@ -41,7 +41,7 @@ public class CreditCard implements Serializable {
     private int creditVerificationValue;
     @Column(nullable = false)
     @NotNull
-    private LocalDate expiryDate;
+    private String expiryDate;
 
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -50,7 +50,7 @@ public class CreditCard implements Serializable {
     public CreditCard() {
     }
 
-    public CreditCard(String nameOnCard, String cardNumber, int creditVerificationValue, LocalDate expiryDate) {
+    public CreditCard(String nameOnCard, String cardNumber, int creditVerificationValue, String expiryDate) {
         this.nameOnCard = nameOnCard;
         this.cardNumber = cardNumber;
         this.creditVerificationValue = creditVerificationValue;
@@ -116,14 +116,14 @@ public class CreditCard implements Serializable {
     /**
      * @return the expiryDate
      */
-    public LocalDate getExpiryDate() {
+    public String getExpiryDate() {
         return expiryDate;
     }
 
     /**
      * @param expiryDate the expiryDate to set
      */
-    public void setExpiryDate(LocalDate expiryDate) {
+    public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
     }
 

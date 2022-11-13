@@ -31,5 +31,7 @@ public interface ReservationSessionBeanLocal {
     public void updateReservation(Reservation reservation) throws ReservationNotFoundException, UpdateReservationException, InputDataValidationException;
 
     public void deleteReservation(Long reservationId) throws ReservationNotFoundException, DeleteReservationException;
+
+    public Reservation retrieveReservationByReservationNumber(String reservationNumber) throws ReservationNotFoundException;
     
 }

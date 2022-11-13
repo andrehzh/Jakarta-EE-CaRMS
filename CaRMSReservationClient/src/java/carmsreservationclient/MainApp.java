@@ -13,10 +13,12 @@ import ejb.session.stateless.ReservationTransactionSessionBeanRemote;
 import entity.Car;
 import entity.CarModel;
 import entity.Category;
+import entity.CreditCard;
 import entity.Outlet;
 import entity.OwnCustomer;
 import entity.RentalRate;
 import entity.Reservation;
+import entity.ReservationTransaction;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,12 +33,16 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.CarStatusEnum;
+import util.enumeration.TransactionStatusEnum;
+import util.exception.CardNumberExistException;
 import util.exception.CustomerEmailExistException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.NoAvailableCarException;
 import util.exception.RentalRateNotFoundException;
+import util.exception.ReservationNotFoundException;
+import util.exception.ReservationNumberExistException;
 import util.exception.UnknownPersistenceException;
 
 /*
@@ -60,6 +66,7 @@ public class MainApp {
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
     private CreditCardSessionBeanRemote creditCardSessionBeanRemote;
     private CustomerSessionBeanRemote customerSessionBeanRemote;
+    private CustomerReservationModule customerReservationModule;
 
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
@@ -84,7 +91,6 @@ public class MainApp {
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
-        this.currentOwnCustomer = currentOwnCustomer;
     }
 
     public void runApp() {
@@ -96,10 +102,12 @@ public class MainApp {
             System.out.println("1: Existing Customer Login");
             System.out.println("2: Register as a new Customer");
             System.out.println("3: Search Car");
-            System.out.println("4: Exit\n");
+            //for testing purposes
+            System.out.println("4: Customer Reservation Module");
+            System.out.println("5: Exit\n");
             response = 0;
 
-            while (response < 1 || response > 4) {
+            while (response < 1 || response > 5) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -116,13 +124,23 @@ public class MainApp {
                 } else if (response == 3) {
                     doSearchCar();
                 } else if (response == 4) {
+                    if (currentOwnCustomer != null) {
+                        customerReservationModule = new CustomerReservationModule(rentalRateSessionBeanRemote, reservationTransactionSessionBeanRemote, outletSessionBeanRemote, reservationSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, partnerSessionBeanRemote, creditCardSessionBeanRemote, customerSessionBeanRemote, customerReservationModule, currentOwnCustomer);
+                    } else {
+                        try {
+                            throw new InvalidLoginCredentialException("No customer logged in!!");
+                        } catch (InvalidLoginCredentialException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                } else if (response == 5) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 4) {
+            if (response == 5) {
                 break;
             }
         }
@@ -491,8 +509,8 @@ public class MainApp {
                 System.out.println("*** Here is the list of available cars you can choose from! ***\n");
                 catRef = 0;
                 for (Car car : suitableCars) {
-                    //BigDecimal price = getReservationPrice(car.getCarModel().getCategory(), searchReservation);
-                    System.out.println(catRef + 1 + ": " + car.getCarModel().getCategory().getCategoryName() + " " + car.getCarModel().getCarModelBrand() + " " + car.getCarModel().getCarModelName() + " " + car.getCarColor());
+                    BigDecimal price = getReservationPrice(car.getCarModel().getCategory(), searchReservation);
+                    System.out.println(catRef + 1 + ": " + car.getCarModel().getCategory().getCategoryName() + " " + car.getCarModel().getCarModelBrand() + " " + car.getCarModel().getCarModelName() + " " + car.getCarColor() + " PRICE: $" + price);
                     catRef++;
 
                 }
@@ -512,8 +530,8 @@ public class MainApp {
                             System.out.println("*** Please select your preferred vehicle! ***\n");
                             catRef = 0;
                             for (Car car : suitableCars) {
-                                //BigDecimal price = getReservationPrice(car.getCarModel().getCategory(), searchReservation);
-                                System.out.println(catRef + 1 + ": " + car.getCarModel().getCategory().getCategoryName() + " " + car.getCarModel().getCarModelBrand() + " " + car.getCarModel().getCarModelName() + " " + car.getCarColor());
+                                BigDecimal price = getReservationPrice(car.getCarModel().getCategory(), searchReservation);
+                                System.out.println(catRef + 1 + ": " + car.getCarModel().getCategory().getCategoryName() + " " + car.getCarModel().getCarModelBrand() + " " + car.getCarModel().getCarModelName() + " " + car.getCarColor() + " PRICE: $" + price);
                                 catRef++;
 
                             }
@@ -527,7 +545,8 @@ public class MainApp {
                                 if (response > 0 && response < catRef - 1) {
                                     selectedCar = suitableCars.get(response - 1);
                                     System.out.println("You have selected Car: " + selectedCar.getCarModel().getCarModelName() + "!\n");
-                                    break;
+                                    System.out.println("With Reservation Details: " + searchReservation.getPickUpDateTime() + " TO " + searchReservation.getDropOffDateTime());
+                                    doMakeReservation(searchReservation, getReservationPrice(selectedCar.getCarModel().getCategory(), searchReservation));
                                 } else {
                                     System.out.println("Invalid option, please try again!\n");
                                 }
@@ -560,38 +579,114 @@ public class MainApp {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         List<LocalDateTime> totalDates = new ArrayList<>();
-        while (!startDate.plusSeconds(1).isAfter(endDate.plusDays(1))) {
+        while (!startDate.plusSeconds(1).isAfter(endDate)) {
             totalDates.add(startDate);
             startDate = startDate.plusDays(1);
         }
-        
-        System.out.println(totalDates.toString());
-        //for every day need to check if has (promo) else (default)
 
+        //System.out.println(totalDates.toString());
+        //for every day need to check if has (promo) else (default)
         try {
             List<RentalRate> categoryRentalRates = rentalRateSessionBeanRemote.retrieveRentalRatesByCategory(carCategory);
-            RentalRate defaultForCategory = null;
-            for (RentalRate rentalRate : categoryRentalRates) {
-                if (rentalRate.getRentalRateType().equals("Default")) {
-                    defaultForCategory = rentalRate;
+//            System.out.println(categoryRentalRates.toString());
+
+            RentalRate defaultRentalRate = null;
+            for (RentalRate rate : categoryRentalRates) {
+                if (rate.getRentalRateType().equals("Default")) {
+                    defaultRentalRate = rate;
                 }
             }
+            //           System.out.println("Default Rental Rate is: $" + defaultRentalRate.getRentalAmount());
 
-            for (LocalDateTime day : totalDates) {
-                System.out.println(day);
-                RentalRate cheapest = defaultForCategory;
+            List<RentalRate> chargedRentalRates = new ArrayList<>();
+
+            for (LocalDateTime date : totalDates) {
+                RentalRate currentRentalRate = defaultRentalRate;
                 for (RentalRate rentalRate : categoryRentalRates) {
-                    if (day.isAfter(rentalRate.getStartDateTime()) && day.isBefore(rentalRate.getEndDateTime()) && rentalRate.getRentalAmount().doubleValue() < defaultForCategory.getRentalAmount().doubleValue()) {
-                        cheapest = rentalRate;
+                    if (rentalRate.getStartDateTime() != null) {
+                        if (date.plusMinutes(1).isAfter(rentalRate.getStartDateTime()) && date.minusMinutes(1).isBefore(rentalRate.getEndDateTime()) && rentalRate.getRentalAmount().subtract(currentRentalRate.getRentalAmount()).intValue() < 0) {
+                            currentRentalRate = rentalRate;
+                        }
                     }
                 }
-                System.out.println(totalAmount);
-                totalAmount = totalAmount.add(cheapest.getRentalAmount());
+                chargedRentalRates.add(currentRentalRate);
+                totalAmount = totalAmount.add(currentRentalRate.getRentalAmount());
+                //               System.out.println(date.toString() + " is " + currentRentalRate.getRentalAmount());
             }
+
         } catch (RentalRateNotFoundException ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return totalAmount;
+    }
+
+    private void doMakeReservation(Reservation reservation, BigDecimal transactionAmount) {
+        Scanner scanner = new Scanner(System.in);
+        if (currentOwnCustomer.getCreditCard() == null) {
+            doRecordCreditCardInformation();
+        }
+        CreditCard customerCard = currentOwnCustomer.getCreditCard();
+        System.out.println("You will use CreditCard: " + customerCard.getCardNumber());
+        System.out.println("*** Please select a payment option! ***\n");
+        System.out.println("1: Immediate Rental Fee Payment");
+        System.out.println("2: Deferred Rental Fee Payment");
+        int response = 0;
+        
+        ReservationTransaction newReservationTransaction = new ReservationTransaction();
+        newReservationTransaction.setTransactionDate(LocalDateTime.now());
+        newReservationTransaction.setTransactionAmount(transactionAmount);
+
+        while (response < 1 || response > 2) {
+            System.out.print("> ");
+
+            response = scanner.nextInt();
+
+            if (response == 1) {
+                System.out.println("You have selected Immediate Payment!");
+                newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAID);
+            } else if (response == 2) {
+                System.out.println("You have selected Deferred Payment!");
+                newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAY_ON_SITE);
+            } else {
+                System.out.println("Invalid option, please try again!\n");
+            }
+        }
+        
+        try {
+            Long reservationTransactionId = reservationTransactionSessionBeanRemote.createNewReservationTransaction(newReservationTransaction);
+            reservation.setReservationNumber("A0" + reservationTransactionId);
+            Long reservationId = reservationSessionBeanRemote.createNewReservation(reservation);
+            
+            reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setReservationTransaction(newReservationTransaction);
+            System.out.print("You have successfully made the reservation your! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: " + reservation.getReservationNumber());
+        } catch (UnknownPersistenceException | InputDataValidationException | ReservationNumberExistException | ReservationNotFoundException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void doRecordCreditCardInformation() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Before Proceeding Please Enter Your Credit Card Details!");
+        CreditCard newCreditCard = new CreditCard();
+        newCreditCard.setCustomer(currentOwnCustomer);
+
+        System.out.print("Enter Name On Card> ");
+        newCreditCard.setNameOnCard(scanner.nextLine().trim());
+        System.out.print("Enter Card Number> ");
+        newCreditCard.setCardNumber(scanner.nextLine().trim());
+        System.out.print("Enter CVV pin> ");
+        newCreditCard.setCreditVerificationValue(scanner.nextInt());
+        System.out.print("Enter ExpiryDate(MM/YY)> ");
+        newCreditCard.setExpiryDate(scanner.nextLine().trim());
+
+        try {
+            Long creditCardId = creditCardSessionBeanRemote.createNewCreditCard(newCreditCard);
+            System.out.println("You have successfully added your Credit Card!: " + creditCardId);
+            currentOwnCustomer.setCreditCard(newCreditCard);
+        } catch (CardNumberExistException | UnknownPersistenceException | InputDataValidationException ex) {
+            ex.printStackTrace();
+        }
 
     }
 
