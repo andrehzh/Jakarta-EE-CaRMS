@@ -36,6 +36,6 @@ public interface ReservationSessionBeanLocal {
 
     public void updateReservationCustomer(Reservation reservation) throws ReservationNotFoundException, UpdateReservationException, InputDataValidationException;
 
-    public List<Reservation> retrieveReservationByCustomerId(Long customerId) throws ReservationNotFoundException;
+    public List<Reservation> retrieveReservationsByCustomerId(Long customerId) throws ReservationNotFoundException;
     
 }

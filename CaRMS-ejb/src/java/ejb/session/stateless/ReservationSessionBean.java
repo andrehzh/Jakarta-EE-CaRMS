@@ -99,7 +99,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public List<Reservation> retrieveReservationByCustomerId(Long customerId) throws ReservationNotFoundException {
+    public List<Reservation> retrieveReservationsByCustomerId(Long customerId) throws ReservationNotFoundException {
         Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.ownCustomer.customerId = :inCustomerId");
         query.setParameter("inCustomerId", customerId);
 

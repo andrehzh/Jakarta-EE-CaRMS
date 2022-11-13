@@ -14,6 +14,7 @@ import entity.Employee;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
@@ -41,11 +42,12 @@ public class MainApp {
 
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private CustomerServiceModule customerServiceModule;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
 
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
@@ -56,6 +58,7 @@ public class MainApp {
         this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
         this.ejbTimerSessionBeanRemote = ejbTimerSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote; 
 
     }
 
@@ -82,7 +85,7 @@ public class MainApp {
 
                         salesManagementModule = new SalesManagementModule(rentalRateSessionBeanRemote, currentEmployee, categorySessionBeanRemote);
                         opsManagementModule = new OpsManagementModule(carModelSessionBeanRemote, carSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, currentEmployee, employeeSessionBeanRemote, categorySessionBeanRemote);
-                        customerServiceModule = new CustomerServiceModule(customerSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote, currentEmployee);
+                        customerServiceModule = new CustomerServiceModule(customerSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote, currentEmployee, reservationSessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");

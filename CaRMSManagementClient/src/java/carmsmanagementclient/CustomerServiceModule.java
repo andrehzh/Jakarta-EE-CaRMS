@@ -8,6 +8,7 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.Car;
 import entity.Customer;
 import entity.Employee;
@@ -20,10 +21,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeAccessRightEnum;
+import util.enumeration.ReservationPickupStatusEnum;
 import util.exception.CarNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidAccessRightException;
 import util.exception.OutletNotFoundException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -38,18 +41,20 @@ public class CustomerServiceModule {
     private CarSessionBeanRemote carSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private Employee currentEmployee;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     public CustomerServiceModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public CustomerServiceModule(CustomerSessionBeanRemote customerSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, Employee currentEmployee) {
+    public CustomerServiceModule(CustomerSessionBeanRemote customerSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, Employee currentEmployee, ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this();
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.currentEmployee = currentEmployee;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
     }
 
     public void menuCustomerService() throws InvalidAccessRightException {
@@ -93,33 +98,46 @@ public class CustomerServiceModule {
         Scanner scanner = new Scanner(System.in);
         Customer cust = new Customer();
         Car car = new Car();
+        Reservation reservation = new Reservation();
 
         System.out.println("*** CaRMS Management Client :: Customer Service :: Pickup Car ***\n");
         System.out.print("Enter Customer ID> ");
         Long custID = scanner.nextLong();
         try {
             cust = customerSessionBeanRemote.retrieveCustomerByCustomerId(custID);
+            System.out.print("Enter Car Plate Number> ");
+            String cp = scanner.next();
+            try {
+                car = carSessionBeanRemote.retrieveCarByCarPlate(cp);
+                if (car.isIsDisabled()) {
+                    System.out.println("This car is disabled!");
+                    return;
+                }
+                try {
+                    List<Reservation> reservations = reservationSessionBeanRemote.retrieveReservationsByCustomerId(custID);
+                    for (Reservation r : reservations) {
+                        if (r.getCar().equals(car)) {
+//                            car.setCarStatus(CarStatusEnum.RESERVED);
+                            car.setOutlet(null);
+                            reservation.setReservationPickupStatus(ReservationPickupStatusEnum.PICKED_UP);
+                            break;
+                        };
+                    }
+                } catch (ReservationNotFoundException ex) {
+                    System.out.println("Customer has no reservation!");
+                    return;
+                }
+
+            } catch (CarNotFoundException ex) {
+                System.out.println("Could not find Car!");
+                return;
+            }
+
         } catch (CustomerNotFoundException ex) {
             System.out.println("Could not find Customer!");
         }
 
 //      TODO: If rental fee payment is deferred during online reservation, it must be paid before the car can be collected.
-        System.out.print("Enter Car Plate Number> ");
-        String cp = scanner.next();
-        try {
-            car = carSessionBeanRemote.retrieveCarByCarPlate(cp);
-            if (car.isIsDisabled()) {
-                System.out.println("This car is disabled!");
-                return;
-            }
-
-            car.setCarStatus(CarStatusEnum.RESERVED);
-            car.setOutlet(null);
-//            car.setCustomer
-        } catch (CarNotFoundException ex) {
-            System.out.println("Could not find Car!");
-        }
-
     }
 
     private void doReturnCar() {
@@ -127,6 +145,7 @@ public class CustomerServiceModule {
         Customer cust = new Customer();
         Car car = new Car();
         Outlet outlet = new Outlet();
+        Reservation reservation = new Reservation();
 
         System.out.println("*** CaRMS Management Client :: Customer Service :: Return Car ***\n");
         System.out.print("Enter Customer ID> ");
@@ -145,12 +164,25 @@ public class CustomerServiceModule {
                 System.out.println("This car is disabled!");
                 return;
             }
-            System.out.print("Enter Outlet to return to> ");
+            System.out.print("Enter Outlet name to return car> ");
             String o = scanner.nextLine();
             try {
                 outlet = outletSessionBeanRemote.retrieveOutletByOutletName(o);
-                car.setCarStatus(CarStatusEnum.AVAILABLE);
-                car.setOutlet(outlet);
+                try {
+                    List<Reservation> reservations = reservationSessionBeanRemote.retrieveReservationsByCustomerId(custID);
+                    for (Reservation r : reservations) {
+                        if (r.getCar().equals(car)) {
+//                            car.setCarStatus(CarStatusEnum.AVAILABLE);
+                            car.setOutlet(outlet);
+                            reservation.setReservationPickupStatus(ReservationPickupStatusEnum.PICKED_UP);
+                            break;
+                        };
+                    }
+                } catch (ReservationNotFoundException ex) {
+                    System.out.println("Customer has no reservation!");
+                    return;
+                }
+
             } catch (OutletNotFoundException ex) {
                 System.out.println("Could not find Outlet!");
                 return;

@@ -90,7 +90,7 @@ public class Reservation implements Serializable {
         this.reservationNumber = reservationNumber;
         this.pickUpDateTime = pickUpDateTime;
         this.dropOffDateTime = dropOffDateTime;
-        reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
+        this.reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
     }
 
     public Reservation(String reservationNumber, LocalDateTime pickUpDateTime, LocalDateTime dropOffDateTime, Outlet pickUpOutlet, Outlet dropOffOutlet) {
@@ -100,7 +100,7 @@ public class Reservation implements Serializable {
         this.dropOffDateTime = dropOffDateTime;
         this.pickUpOutlet = pickUpOutlet;
         this.dropOffOutlet = dropOffOutlet;
-        reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
+        this.reservationPickupStatus = ReservationPickupStatusEnum.AWAITING;
     }
 
     public Long getReservationId() {
