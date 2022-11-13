@@ -15,11 +15,16 @@ import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.ReservationTransactionSessionBeanRemote;
 import entity.OwnCustomer;
+import entity.Reservation;
+import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exception.InvalidLoginCredentialException;
+import util.exception.DeleteReservationException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -80,7 +85,111 @@ public class CustomerReservationModule {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    System.out.println("doViewAllReservations()");
+                    doViewAllReservations();
+                } else if (response == 2) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+
+            if (response == 2) {
+                break;
+            }
+        }
+    }
+
+    private void doViewAllReservations() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** Here are your reservations! ***\n");
+        try {
+            List<Reservation> allReservations = reservationSessionBeanRemote.retrieveReservationByCustomerId(currentOwnCustomer.getCustomerId());
+            int i = 1;
+            for (Reservation reservation : allReservations) {
+                System.out.println(i + ": " + reservation.getReservationNumber());
+                i++;
+            }
+            Integer response = 0;
+            System.out.println("\n1: View Reservation Details");
+            System.out.println("2: Exit\n");
+            response = 0;
+            Reservation selectedReservation = null;
+            while (true) {
+                while (response < 1 || response > 2) {
+                    System.out.print("> ");
+
+                    response = scanner.nextInt();
+
+                    if (response == 1) {
+                        System.out.println("Please select an option!\n");
+                        int catRef = 0;
+                        for (Reservation reservation : allReservations) {
+
+                            System.out.println(catRef + 1 + ": " + reservation.getReservationNumber());
+                            catRef++;
+
+                        }
+                        catRef++;
+                        System.out.println(catRef + ": Exit\n");
+                        response = 0;
+                        while (response < 1 || response > catRef) {
+                            System.out.print("> ");
+
+                            response = scanner.nextInt();
+
+                            if (response > 0 && response < catRef) {
+                                selectedReservation = allReservations.get(response - 1);
+                                System.out.println("You have selected Reservation: " + selectedReservation.getReservationNumber() + "!\n");
+                                doDisplayReservationDetail(selectedReservation);
+                                break;
+                            } else if (response == catRef) {
+                                break;
+                            } else {
+                                System.out.println("Invalid option, please try again!\n");
+                            }
+                        }
+
+                    } else if (response == 2) {
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
+
+                if (response == 2) {
+                    break;
+                }
+            }
+        } catch (ReservationNotFoundException ex) {
+            Logger.getLogger(CustomerReservationModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void doDisplayReservationDetail(Reservation reservation) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Reservation Number: " + reservation.getReservationNumber());
+        System.out.println("Reservation Pick Up Date: " + reservation.getPickUpDateTime());
+        System.out.println("Reservation Drop Off Date: " + reservation.getDropOffDateTime());
+        System.out.println("Reservation Pick Up Outlet: " + reservation.getPickUpOutlet());
+        System.out.println("Reservation Drop Off Outlet: " + reservation.getDropOffOutlet());
+        int response = 0;
+        while (true) {
+            System.out.println("\n*** Select an Option ***");
+            System.out.println("1: Cancel Reservation");
+            System.out.println("2: Exit\n");
+            while (response < 1 || response > 2) {
+                System.out.print("> ");
+
+                response = scanner.nextInt();
+
+                if (response == 1) {
+                    try {
+                        reservationSessionBeanRemote.deleteReservation(reservation.getReservationId());
+                        System.out.println("Reservation has been deleted successfully!");
+                        break;
+                    } catch (ReservationNotFoundException | DeleteReservationException ex) {
+                        Logger.getLogger(CustomerReservationModule.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else if (response == 2) {
                     break;
                 } else {

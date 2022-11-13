@@ -45,6 +45,7 @@ import util.exception.ReservationNotFoundException;
 import util.exception.ReservationNumberExistException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCustomerException;
+import util.exception.UpdateReservationException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -97,16 +98,18 @@ public class MainApp {
         Integer response = 0;
 
         while (true) {
+
             System.out.println("*** Welcome to CaRMS Reservation Client ***\n");
             System.out.println("1: Existing Customer Login");
             System.out.println("2: Register as a new Customer");
             System.out.println("3: Search Car");
             //for testing purposes
             System.out.println("4: Customer Reservation Module");
-            System.out.println("5: Exit\n");
+            System.out.println("5: Customer Logout");
+            System.out.println("6: Exit\n");
             response = 0;
 
-            while (response < 1 || response > 5) {
+            while (response < 1 || response > 6) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -126,21 +129,25 @@ public class MainApp {
                 } else if (response == 4) {
                     if (currentOwnCustomer != null) {
                         customerReservationModule = new CustomerReservationModule(rentalRateSessionBeanRemote, reservationTransactionSessionBeanRemote, outletSessionBeanRemote, reservationSessionBeanRemote, categorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, partnerSessionBeanRemote, customerSessionBeanRemote, customerReservationModule, currentOwnCustomer);
+                        customerReservationModule.runApp();
                     } else {
                         try {
                             throw new InvalidLoginCredentialException("No customer logged in!!");
+
                         } catch (InvalidLoginCredentialException ex) {
                             ex.printStackTrace();
                         }
                     }
                 } else if (response == 5) {
+                    doLogout();
+                } else if (response == 6) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 5) {
+            if (response == 6) {
                 break;
             }
         }
@@ -437,7 +444,6 @@ public class MainApp {
             //sorts the pending reservations by earliest
             Collections.sort(pendingReservations, (Reservation o1, Reservation o2) -> o1.getPickUpDateTime().compareTo(o2.getPickUpDateTime()));
 
-
             //find conflicting reservations
             //loop through the list to find similar or conflicting reservations and get a number of conflicting reservations?
             //i need to be returning a list of Cars which are available so actually i should sort through the list of reservations
@@ -480,7 +486,6 @@ public class MainApp {
                     }
                 }
             }
-            
 
             System.out.println(conflictingReservations.toString());
             //check the cars to see which fits
@@ -646,22 +651,32 @@ public class MainApp {
                 if (response == 1) {
                     System.out.println("You have selected Immediate Payment!");
                     newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAID);
+                    break;
                 } else if (response == 2) {
                     System.out.println("You have selected Deferred Payment!");
                     newReservationTransaction.setTransactionStaus(TransactionStatusEnum.PAY_ON_SITE);
+                    break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
+            customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getReservations().size();
+            customerSessionBeanRemote.retrieveOwnCustomerByCustomerId(currentOwnCustomer.getCustomerId()).getReservations().add(reservation);
+
             Long reservationTransactionId = reservationTransactionSessionBeanRemote.createNewReservationTransaction(newReservationTransaction);
+
             reservation.setReservationNumber("A0" + reservationTransactionId);
+
+            reservation.setOwnCustomer(currentOwnCustomer);
+
+            reservation.setReservationTransaction(newReservationTransaction);
+
             Long reservationId = reservationSessionBeanRemote.createNewReservation(reservation);
 
-            reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setReservationTransaction(newReservationTransaction);
-            reservationSessionBeanRemote.retrieveReservationByReservationId(reservationId).setOwnCustomer(currentOwnCustomer);
-            System.out.print("You have successfully made the reservation! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: " + reservation.getReservationNumber() + "\n");
-        } catch (CustomerNotFoundException | UnknownPersistenceException | InputDataValidationException | ReservationNumberExistException | ReservationNotFoundException  ex) {
+            System.out.println("You have successfully made the reservation! \nTransaction ID: " + reservationTransactionId + "\nReservation Number: A0" + reservationId + "\n");
+
+        } catch (CustomerNotFoundException | UnknownPersistenceException | InputDataValidationException | ReservationNumberExistException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -670,11 +685,10 @@ public class MainApp {
     private void doRecordCreditCardInformation() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Before Proceeding Please Enter Your Credit Card Details!\n");
-        
 
         String ccNum = "";
         String cvv = "";
-        
+
         System.out.print("Enter Card Number> ");
         ccNum = scanner.nextLine().trim();
 
@@ -689,6 +703,15 @@ public class MainApp {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    
+    private void doLogout() {
+        if (currentOwnCustomer != null) {
+            currentOwnCustomer = null;
+            System.out.println("*** Logged out successfully! ***\n");
+        } else {
+            System.out.println("*** Please Log In First! ***\n");
+        }
     }
 
     private void showInputDataValidationErrorsForOwnCustomer(Set<ConstraintViolation<OwnCustomer>> constraintViolations) {

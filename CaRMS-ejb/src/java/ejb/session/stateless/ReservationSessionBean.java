@@ -99,6 +99,18 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
+    public List<Reservation> retrieveReservationByCustomerId(Long customerId) throws ReservationNotFoundException {
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.ownCustomer.customerId = :inCustomerId");
+        query.setParameter("inCustomerId", customerId);
+
+        if (query.getResultList() != null) {
+            return query.getResultList();
+        } else {
+            throw new ReservationNotFoundException("Customer Id " + customerId + " does not exist!");
+        }
+    }
+
+    @Override
     public void updateReservation(Reservation reservation) throws ReservationNotFoundException, UpdateReservationException, InputDataValidationException {
         if (reservation != null && reservation.getReservationId() != null) {
             Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
@@ -117,6 +129,28 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     reservationToUpdate.setPickUpOutlet(reservation.getPickUpOutlet());
                     reservationToUpdate.setDropOffOutlet(reservation.getDropOffOutlet());
                     reservationToUpdate.setCategory(reservation.getCategory());
+                    // able to update everything except number cause unique
+                } else {
+                    throw new UpdateReservationException("UpdateReservationException");
+                }
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new ReservationNotFoundException("ReservationNotFoundException");
+        }
+    }
+
+    @Override
+    public void updateReservationCustomer(Reservation reservation) throws ReservationNotFoundException, UpdateReservationException, InputDataValidationException {
+        if (reservation != null && reservation.getReservationId() != null) {
+            Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
+
+            if (constraintViolations.isEmpty()) {
+                Reservation reservationToUpdate = retrieveReservationByReservationId(reservation.getReservationId());
+
+                if (reservationToUpdate.getReservationNumber().equals(reservation.getReservationNumber())) {
+                    reservationToUpdate.setOwnCustomer(reservation.getOwnCustomer());
                     // able to update everything except number cause unique
                 } else {
                     throw new UpdateReservationException("UpdateReservationException");
